@@ -1,0 +1,417 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e8f5e9;
+  display: flex;
+}
+
+/* ---- sidebar fijo ---- */
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background-color: #1a2e44;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-top: 20px;
+}
+
+.sidebar-seccion {
+  color: #aabbcc;
+  font-size: 11px;
+  padding: 15px 15px 5px 15px;
+  text-transform: uppercase;
+}
+
+.sidebar a {
+  display: block;
+  color: #ccdde8;
+  text-decoration: none;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.sidebar a:hover {
+  background-color: #2a3f58;
+}
+
+.sidebar a.activo {
+  background-color: #4caf7d;
+  color: white;
+  border-radius: 6px;
+  margin: 0 8px;
+  padding: 10px 10px;
+}
+
+/* ---- contenido desplazable ---- */
+.contenido {
+  margin-left: 200px;
+  flex: 1;
+  padding: 30px;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+h1 {
+  font-size: 22px;
+  color: #1a2e44;
+}
+
+.subtitulo {
+  color: #888;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+/* ---- tabs ---- */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #c8ddd0;
+  margin-bottom: 25px;
+}
+
+.tabs a {
+  text-decoration: none;
+  padding: 10px 18px;
+  font-size: 13px;
+  color: #888;
+}
+
+.tabs a.tab-activo {
+  color: #4caf7d;
+  border-bottom: 2px solid #4caf7d;
+  margin-bottom: -2px;
+  font-weight: bold;
+}
+
+.tabs a:hover {
+  color: #4caf7d;
+}
+
+/* ---- fila titulo ---- */
+.fila-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.fila-titulo h2 {
+  font-size: 18px;
+  color: #1a2e44;
+}
+
+.btn-cancelar {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+.btn-cancelar:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-guardar {
+  background-color: #4caf7d;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: white;
+  margin-left: 10px;
+}
+
+.btn-guardar:hover {
+  background-color: #3a9668;
+}
+
+/* ---- dos columnas ---- */
+.dos-columnas {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.col-izquierda {
+  flex: 1;
+}
+
+.col-derecha {
+  width: 270px;
+}
+
+/* ---- tarjeta ---- */
+.tarjeta {
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 16px;
+}
+
+.tarjeta h3 {
+  font-size: 15px;
+  color: #1a2e44;
+  margin-bottom: 18px;
+}
+
+/* ---- labels e inputs ---- */
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 7px;
+  background-color: #e8f0eb;
+  font-size: 13px;
+  color: #555;
+  font-family: Arial, sans-serif;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+  background-color: #d8ebe0;
+}
+
+textarea {
+  height: 70px;
+  resize: none;
+}
+
+.texto-ayuda {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+/* ---- filas de campos ---- */
+.fila-3 {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.fila-3 .campo {
+  flex: 1;
+}
+
+.fila-2 {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.fila-2 .campo {
+  flex: 1;
+}
+
+.campo-solo {
+  margin-bottom: 16px;
+}
+
+/* ---- prefijo $ ---- */
+.con-prefijo {
+  position: relative;
+}
+
+.con-prefijo span {
+  position: absolute;
+  left: 11px;
+  top: 10px;
+  font-size: 13px;
+  color: #777;
+}
+
+.con-prefijo input {
+  padding-left: 22px;
+}
+
+/* ---- validaciones ---- */
+.requerido {
+  color: #e53935;
+  margin-left: 2px;
+}
+
+.error-campo {
+  display: block;
+  font-size: 11px;
+  color: #e53935;
+  margin-top: 4px;
+}
+
+.mensajes-error {
+  display: block;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: #c62828;
+}
+
+/* input con error (clase que JSF agrega cuando falla validacion) */
+input.error,
+select.error,
+textarea.error {
+  border: 1px solid #e53935;
+  background-color: #fff5f5;
+}
+
+/* ---- config toggles ---- */
+.fila-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.fila-toggle:last-child {
+  border-bottom: none;
+}
+
+.toggle-texto p {
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a2e44;
+}
+
+.toggle-texto small {
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* ---- switch ---- */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  display: inline-block;
+}
+
+.switch input {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  cursor: pointer;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.switch input:checked + .slider {
+  background-color: #4caf7d;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* ---- dias alerta ---- */
+.campo-config {
+  padding-top: 13px;
+}
+
+.campo-config label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a2e44;
+  margin-bottom: 8px;
+}
+
+/* ---- categorias ---- */
+.categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: #f0f5f2;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+}
+
+.chip.seleccionado {
+  background-color: #d4edd9;
+  border-color: #4caf7d;
+  color: #2a7a50;
+}
+
+/* ---- proveedores ---- */
+.proveedor-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f0f5f2;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.proveedor-btn:hover {
+  border-color: #4caf7d;
+}
+
+.proveedor-btn.seleccionado {
+  background-color: #d4edd9;
+  border-color: #4caf7d;
+  color: #2a7a50;
+}
+
+/* ---- stock inicial ---- */
+.campo-stock {
+  margin-bottom: 12px;
+}

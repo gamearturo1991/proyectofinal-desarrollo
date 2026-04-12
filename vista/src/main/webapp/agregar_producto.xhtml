@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+  <meta charset="UTF-8"/>
+  <title>Gestion de Productos</title>
+  <h:outputStylesheet library="styles" name="productos_agregar_producto.css"/>
+  <h:outputScript library="scripts" name="productos_agregar_producto.js"/>
+</h:head>
+
+<h:body>
+
+  <!-- sidebar fijo -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <a href="#">Dashboard</a>
+
+    <div class="sidebar-seccion">Inventario</div>
+    <a href="#" class="activo">Productos</a>
+  </div>
+
+  <!-- contenido desplazable -->
+  <div class="contenido">
+
+    <h:form id="formProducto">
+
+      <h:messages globalOnly="false"
+                  styleClass="mensajes-error"
+                  showDetail="true"
+                  showSummary="false"/>
+
+      <h1>Gestion de Productos</h1>
+      <p class="subtitulo">Agregar nuevo producto</p>
+
+      <div class="tabs">
+        <a href="#">Lista de Productos</a>
+        <a href="#" class="tab-activo">Agregar Producto</a>
+        <a href="#">Editar Producto</a>
+      </div>
+
+      <div class="fila-titulo">
+        <h2>Agregar Producto</h2>
+        <div>
+          <h:commandButton value="Cancelar"
+                           immediate="true"
+                           action="#{productoBeanUI.limpiar}"
+                           styleClass="btn-cancelar"/>
+
+          <h:commandButton value="&#10003; Registrar Producto"
+                           action="#{productoBeanUI.guardar}"
+                           styleClass="btn-guardar"/>
+        </div>
+      </div>
+
+      <div class="dos-columnas">
+
+        <!-- ========== COLUMNA IZQUIERDA ========== -->
+        <div class="col-izquierda">
+
+          <div class="tarjeta">
+            <h3>Informacion del Producto</h3>
+
+            <!-- SKU | Nombre | Codigo barras -->
+            <div class="fila-3">
+              <div class="campo">
+                <label for="formProducto:sku">
+                  SKU <span class="requerido">*</span>
+                </label>
+                <h:inputText id="sku"
+                             value="#{productoBeanUI.sku}"
+                             required="true"
+                             requiredMessage="El SKU es obligatorio"
+                             maxlength="50"/>
+                <h:message for="sku" styleClass="error-campo"/>
+              </div>
+
+              <div class="campo">
+                <label for="formProducto:nombre">
+                  Nombre <span class="requerido">*</span>
+                </label>
+                <h:inputText id="nombre"
+                             value="#{productoBeanUI.nombre}"
+                             required="true"
+                             requiredMessage="El nombre es obligatorio"
+                             maxlength="200"/>
+                <h:message for="nombre" styleClass="error-campo"/>
+              </div>
+
+              <div class="campo">
+                <label for="formProducto:codigoBarras">Codigo de Barras</label>
+                <h:inputText id="codigoBarras"
+                             value="#{productoBeanUI.codigoBarras}"
+                             maxlength="50"/>
+              </div>
+            </div>
+
+            <!-- Descripcion -->
+            <div class="campo-solo">
+              <label for="formProducto:descripcion">Descripcion</label>
+              <h:inputTextarea id="descripcion"
+                               value="#{productoBeanUI.descripcion}"
+                               maxlength="255"/>
+            </div>
+
+            <!-- Precio venta | Precio costo | Unidad medida -->
+            <div class="fila-3">
+              <div class="campo">
+                <label for="formProducto:precioVenta">
+                  Precio de Venta <span class="requerido">*</span>
+                </label>
+                <div class="con-prefijo">
+                  <span>$</span>
+                  <h:inputText id="precioVenta"
+                               value="#{productoBeanUI.precioVenta}"
+                               required="true"
+                               requiredMessage="El precio de venta es obligatorio"
+                               validatorMessage="Ingresa un numero valido mayor a 0">
+                    <f:validateDoubleRange minimum="0.01"/>
+                  </h:inputText>
+                </div>
+                <h:message for="precioVenta" styleClass="error-campo"/>
+              </div>
+
+              <div class="campo">
+                <label for="formProducto:precioCompra">
+                  Precio de Costo <span class="requerido">*</span>
+                </label>
+                <div class="con-prefijo">
+                  <span>$</span>
+                  <h:inputText id="precioCompra"
+                               value="#{productoBeanUI.precioCompra}"
+                               required="true"
+                               requiredMessage="El precio de costo es obligatorio"
+                               validatorMessage="Ingresa un numero valido mayor a 0">
+                    <f:validateDoubleRange minimum="0.01"/>
+                  </h:inputText>
+                </div>
+                <h:message for="precioCompra" styleClass="error-campo"/>
+              </div>
+
+              <div class="campo">
+                <label for="formProducto:unidadMedida">
+                  Unidad de Medida <span class="requerido">*</span>
+                </label>
+                <h:selectOneMenu id="unidadMedida"
+                                 value="#{productoBeanUI.unidadMedida}"
+                                 required="true"
+                                 requiredMessage="Selecciona una unidad de medida">
+                  <f:selectItem itemValue=""
+                                itemLabel="-- Seleccionar --"
+                                noSelectionOption="true"/>
+                  <f:selectItems value="#{productoBeanUI.unidadesMedida}"
+                                 var="u"
+                                 itemValue="#{u}"
+                                 itemLabel="#{productoBeanUI.getLabelUnidad(u)}"/>
+                </h:selectOneMenu>
+                <h:message for="unidadMedida" styleClass="error-campo"/>
+              </div>
+            </div>
+
+            <!-- Stock minimo | Stock maximo -->
+            <div class="fila-2">
+              <div class="campo">
+                <label for="formProducto:stockMinimo">Stock Minimo (Alerta)</label>
+                <h:inputText id="stockMinimo"
+                             value="#{productoBeanUI.stockMinimo}"/>
+                <p class="texto-ayuda">Se disparara alerta cuando llegue a esta cantidad</p>
+              </div>
+
+              <div class="campo">
+                <label for="formProducto:stockMaximo">Stock Maximo (Alerta)</label>
+                <h:inputText id="stockMaximo"
+                             value="#{productoBeanUI.stockMaximo}"/>
+                <p class="texto-ayuda">Se disparara alerta para no tener stock de mas</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Configuracion -->
+          <div class="tarjeta">
+            <h3>Configuracion</h3>
+
+            <div class="fila-toggle">
+              <div class="toggle-texto">
+                <p>Producto Activo</p>
+                <small>Visible en punto de venta</small>
+              </div>
+              <label class="switch">
+                <h:selectBooleanCheckbox id="activo"
+                                         value="#{productoBeanUI.activo}">
+                  <f:ajax />
+                </h:selectBooleanCheckbox>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="fila-toggle">
+              <div class="toggle-texto">
+                <p>Control de Caducidad</p>
+                <small>Gestiona fecha de vencimiento por lote</small>
+              </div>
+              <label class="switch">
+                <h:selectBooleanCheckbox id="controlaCaducidad"
+                                         value="#{productoBeanUI.controlaCaducidad}"/>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="campo-config">
+              <label for="formProducto:diasAlerta">Dias Alerta Caducidad</label>
+              <h:inputText id="diasAlerta"
+                           value="#{productoBeanUI.diasAlertaCaducidad}"/>
+              <p class="texto-ayuda">Se notificara cuando se cumplan los dias que faltan para caducar</p>
+            </div>
+
+            <div class="fila-toggle">
+              <div class="toggle-texto">
+                <p>Requiere Lote</p>
+                <small>Obliga seleccionar lote en cada venta</small>
+              </div>
+              <label class="switch">
+                <h:selectBooleanCheckbox id="requiereLote"
+                                         value="#{productoBeanUI.requiereLote}"/>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========== COLUMNA DERECHA ========== -->
+        <div class="col-derecha">
+
+          <div class="tarjeta">
+            <h3>Categoria</h3>
+            <div class="categorias">
+              <span class="chip seleccionado" onclick="toggleChip(this)">Bebidas</span>
+              <span class="chip" onclick="toggleChip(this)">Snacks</span>
+            </div>
+          </div>
+
+          <div class="tarjeta">
+            <h3>Proveedores</h3>
+            <button type="button" class="proveedor-btn" onclick="toggleProv(this)">Mayoreo Calimax</button>
+            <button type="button" class="proveedor-btn" onclick="toggleProv(this)">Mayoreo WELTON</button>
+          </div>
+
+          <!-- Stock inicial: campos del lote, apuntan al bean no a la entidad -->
+          <div class="tarjeta">
+            <h3>Stock Inicial</h3>
+
+            <div class="campo-stock">
+              <label for="formProducto:cantidadInicial">Cantidad Inicial</label>
+              <h:inputText id="cantidadInicial"
+                           value="#{productoBeanUI.cantidadInicial}"/>
+            </div>
+
+            <div class="campo-stock">
+              <label for="formProducto:fechaCaducidad">Fecha de Caducidad</label>
+              <h:inputText id="fechaCaducidad"
+                           value="#{productoBeanUI.fechaCaducidadLote}"
+                           placeholder="dd/MM/yyyy">
+                <f:convertDateTime pattern="dd/MM/yyyy" type="localDate"/>
+              </h:inputText>
+            </div>
+
+            <div class="campo-stock">
+              <label for="formProducto:numeroLote">Numero de Lote</label>
+              <h:inputText id="numeroLote"
+                           value="#{productoBeanUI.numeroLote}"
+                           placeholder="LOT-2026-001"/>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </h:form>
+
+  </div>
+
+</h:body>
+</html>

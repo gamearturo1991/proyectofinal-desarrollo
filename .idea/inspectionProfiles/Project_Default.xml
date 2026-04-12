@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="InspectionProjectProfileManager">
+    <profile version="1.0">
+      <option name="myName" value="Project Default" />
+      <!-- Desactivar advertencias de URI no registrados para JSF/PrimeFaces -->
+      <inspection_tool class="HtmlUnknownAttribute" enabled="false" level="WARNING" />
+      <inspection_tool class="XmlUnresolvedReference" enabled="false" level="WARNING" />
+      <inspection_tool class="XmlDuplicatedId" enabled="false" level="WARNING" />
+      <inspection_tool class="RequiredAttributes" enabled="false" level="WARNING" />
+      <inspection_tool class="HtmlUnknownTag" enabled="false" level="WARNING" />
+      <inspection_tool class="MissingRequiredAttribute" enabled="false" level="WARNING" />
+    </profile>
+  </component>
+</project>
+
+

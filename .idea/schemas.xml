@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalXmlSchemaManager">
+    <state>
+      <Schema url="http://xmlns.jcp.org/jsf/html" location="$PROJECT_DIR$/.idea/schemas/jsf-html.xsd" />
+      <Schema url="http://xmlns.jcp.org/jsf/core" location="$PROJECT_DIR$/.idea/schemas/jsf-core.xsd" />
+      <Schema url="http://xmlns.jcp.org/jsf/facelets" location="$PROJECT_DIR$/.idea/schemas/jsf-facelets.xsd" />
+      <Schema url="http://primefaces.org/ui" location="$PROJECT_DIR$/.idea/schemas/primefaces.xsd" />
+    </state>
+  </component>
+</project>
+

@@ -1,0 +1,19 @@
+package mx.swb.DAO;
+
+import jakarta.persistence.EntityManager;
+import mx.swb.persistence.AbstractDAO;
+import mx.swb.entity.Producto;
+
+public class ProductoDAO extends AbstractDAO<Producto> {
+    private final EntityManager entityManager;
+
+    public ProductoDAO(EntityManager em) {
+        super(Producto.class);
+        this.entityManager = em;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+}

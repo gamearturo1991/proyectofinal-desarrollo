@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebContextManager">
+    <option name="state">
+      <map>
+        <entry key="file://$PROJECT_DIR$/vista/src/main/webapp/agregar_producto.xhtml" value="file://$PROJECT_DIR$/vista/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/vista/src/main/webapp/asignaciones.xhtml" value="file://$PROJECT_DIR$/vista/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/vista/src/main/webapp/login.xhtml" value="file://$PROJECT_DIR$/vista/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/vista/src/main/webapp/registroDocente.xhtml" value="file://$PROJECT_DIR$/vista/src/main/webapp" />
+      </map>
+    </option>
+  </component>
+</project>
