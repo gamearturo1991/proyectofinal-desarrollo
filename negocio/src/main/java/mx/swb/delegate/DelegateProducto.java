@@ -1,14 +1,26 @@
 package mx.swb.delegate;
 
+import mx.swb.DAO.ProductoDAO;
 import mx.swb.entity.Producto;
 import mx.swb.integration.ServiceLocator;
-import mx.swb.DAO.ProductoDAO;
 
 public class DelegateProducto {
 
+    private final ProductoDAO productoDAO;
+
+    public DelegateProducto() {
+        this.productoDAO = ServiceLocator.getInstanceProductoDAO();
+    }
+
     public void guardar(Producto producto) {
-        ProductoDAO productoDAO = ServiceLocator.getInstanceProductoDAO();
         productoDAO.save(producto);
     }
-}
 
+    public Producto buscarPorSku(String sku) {
+        return productoDAO.findByOneParameterUnique(sku, "sku");
+    }
+
+    public Producto buscarPorCodigoBarras(String codigoBarras) {
+        return productoDAO.findByOneParameterUnique(codigoBarras, "codigoBarras");
+    }
+}

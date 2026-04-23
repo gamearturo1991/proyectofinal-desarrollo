@@ -1,7 +1,6 @@
 package mx.swb.facade;
 
 import mx.swb.entity.Producto;
-import mx.swb.integration.ServiceLocator;
 import mx.swb.negocio.ProductoService;
 
 import java.math.BigDecimal;
@@ -23,24 +22,12 @@ public class FacadeProducto {
         Boolean requiereLote,
         Boolean activo
     ) {
-        ProductoService service = new ProductoService(
-            ServiceLocator.getInstanceProductoDAO().getEntityManager()
-        );
 
+        ProductoService service = new ProductoService();
         return service.registrarProducto(
-            codigoBarras,
-            sku,
-            nombre,
-            descripcion,
-            unidadMedida,
-            precioCompra,
-            precioVenta,
-            stockMinimo,
-            stockMaximo,
-            controlaCaducidad,
-            diasAlertaCaducidad,
-            requiereLote,
-            activo
+            codigoBarras, sku, nombre, descripcion, unidadMedida,
+            precioCompra, precioVenta, stockMinimo, stockMaximo,
+            controlaCaducidad, diasAlertaCaducidad, requiereLote, activo
         );
     }
 }

@@ -1,18 +1,18 @@
 package mx.swb.negocio;
 
-import jakarta.persistence.EntityManager;
-import mx.swb.DAO.ProductoDAO;
+import mx.swb.delegate.DelegateProducto;
 import mx.swb.entity.Producto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class ProductoService {
+    private final DelegateProducto delegateProducto;
 
-    private final ProductoDAO productoDAO;
-
-    public ProductoService(EntityManager em) {
-        this.productoDAO = new ProductoDAO(em);
+    public ProductoService() {
+        this.delegateProducto = new DelegateProducto();
     }
 
     public Producto registrarProducto(
@@ -30,29 +30,11 @@ public class ProductoService {
         Boolean requiereLote,
         Boolean activo
     ) {
+        validarProducto(codigoBarras, sku, nombre, descripcion, unidadMedida,
+            precioCompra, precioVenta, stockMinimo, stockMaximo,
+            controlaCaducidad, diasAlertaCaducidad, requiereLote, activo, null);
 
-        // Funcion de validacion de atributos
-        validarProducto(
-            codigoBarras,
-            sku,
-            nombre,
-            descripcion,
-            unidadMedida,
-            precioCompra,
-            precioVenta,
-            stockMinimo,
-            stockMaximo,
-            controlaCaducidad,
-            diasAlertaCaducidad,
-            requiereLote,
-            activo,
-            null
-        );
-
-        // Creación de Producto
         Producto p = new Producto();
-
-        // Setteo de atributos
         p.setCodigoBarras(codigoBarras);
         p.setSku(sku.trim());
         p.setNombre(nombre);
@@ -66,10 +48,15 @@ public class ProductoService {
         p.setDiasAlertaCaducidad(diasAlertaCaducidad != null ? diasAlertaCaducidad : 30);
         p.setRequiereLote(requiereLote != null ? requiereLote : false);
         p.setActivo(activo != null ? activo : true);
-        p.setFechaBaja(null);
 
-        // Guradado
-        productoDAO.save(p);
+        boolean estaActivo = activo != null ? activo : true;
+        if (!estaActivo) {
+            p.setFechaBaja(ZonedDateTime.now(ZoneId.of("America/Tijuana")).toLocalDateTime());
+        } else {
+            p.setFechaBaja(null);
+        }
+
+        delegateProducto.guardar(p);
 
         return p;
     }
@@ -90,15 +77,14 @@ public class ProductoService {
         Boolean activo,
         LocalDateTime fechaBaja
     ) {
-
         if (sku == null || sku.isBlank())
             throw new IllegalArgumentException("El SKU es obligatorio");
 
         if (sku.trim().length() > 50)
             throw new IllegalArgumentException("El SKU no puede superar 50 caracteres");
 
-        if (productoDAO.findByOneParameterUnique(sku.trim(), "sku") != null)
-            throw new IllegalStateException("Ya existe un producto con el SKU: " + sku);
+        if (delegateProducto.buscarPorSku(sku.trim()) != null)
+            throw new IllegalStateException("El SKU ya existe, ingresa uno diferente");
 
         if (nombre == null || nombre.isBlank())
             throw new IllegalArgumentException("El nombre es obligatorio");
@@ -117,36 +103,33 @@ public class ProductoService {
 
         if (codigoBarras != null && !codigoBarras.isBlank()) {
             if (codigoBarras.length() > 50)
-                throw new IllegalArgumentException("El código de barras no puede superar 50 caracteres");
+                throw new IllegalArgumentException("El codigo de barras no puede superar 50 caracteres");
 
-            if (productoDAO.findByOneParameterUnique(codigoBarras.trim(), "codigoBarras") != null)
-                throw new IllegalStateException("Ya existe un producto con ese código de barras");
+            if (delegateProducto.buscarPorCodigoBarras(codigoBarras.trim()) != null)
+                throw new IllegalStateException("El codigo de barras ya existe, ingresa uno diferente");
         }
 
         if (descripcion != null && descripcion.length() > 255)
-            throw new IllegalArgumentException("La descripción no puede superar 255 caracteres");
+            throw new IllegalArgumentException("La descripcion no puede superar 255 caracteres");
 
         if (stockMinimo != null && stockMinimo.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("El stock mínimo no puede ser negativo");
+            throw new IllegalArgumentException("El stock minimo no puede ser negativo");
 
         if (stockMaximo != null && stockMaximo.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("El stock máximo no puede ser negativo");
+            throw new IllegalArgumentException("El stock maximo no puede ser negativo");
 
-        if (stockMinimo != null && stockMaximo != null) {
+        if (stockMinimo != null && stockMaximo != null)
             if (stockMinimo.compareTo(stockMaximo) > 0)
-                throw new IllegalArgumentException("El stock mínimo no puede ser mayor al máximo");
-        }
+                throw new IllegalArgumentException("El stock minimo no puede ser mayor al maximo");
 
-        if (controlaCaducidad != null && controlaCaducidad) {
+        if (controlaCaducidad != null && controlaCaducidad)
             if (diasAlertaCaducidad == null || diasAlertaCaducidad < 0)
-                throw new IllegalArgumentException("Los días de alerta de caducidad deben ser >= 0");
-        }
+                throw new IllegalArgumentException("Los dias de alerta de caducidad deben ser >= 0");
 
         if (fechaBaja != null && fechaBaja.isAfter(LocalDateTime.now()))
             throw new IllegalArgumentException("La fecha de baja no puede ser futura");
 
-        if (requiereLote != null && requiereLote && (controlaCaducidad == null || !controlaCaducidad)) {
+        if (requiereLote != null && requiereLote && (controlaCaducidad == null || !controlaCaducidad))
             throw new IllegalArgumentException("Si requiere lote, debe controlar caducidad");
-        }
     }
 }
