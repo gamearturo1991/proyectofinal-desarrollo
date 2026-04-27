@@ -18,7 +18,8 @@ public class HibernateUtil {
         try {
             return Persistence.createEntityManagerFactory("refresqueria_pu");
         } catch (Throwable ex) {
-            System.err.println("Error creando EntityManagerFactory: " + ex);
+            System.err.println("Error creando EntityManagerFactory: " + ex.getMessage());
+            ex.printStackTrace(System.err);
             throw new ExceptionInInitializerError(ex);
         }
     }

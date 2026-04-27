@@ -1,0 +1,126 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e8f5e9;
+  display: flex;
+}
+
+/* ---- sidebar ---- */
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background-color: #1a2e44;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-top: 20px;
+}
+
+.sidebar-seccion {
+  color: #aabbcc;
+  font-size: 11px;
+  padding: 15px 15px 5px 15px;
+  text-transform: uppercase;
+}
+
+.sidebar a {
+  display: block;
+  color: #ccdde8;
+  text-decoration: none;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.sidebar a:hover {
+  background-color: #2a3f58;
+}
+
+.sidebar a.activo {
+  background-color: #4caf7d;
+  color: white;
+  border-radius: 6px;
+  margin: 0 8px;
+  padding: 10px 10px;
+}
+/* ---- contenido ---- */
+.contenido {
+  margin-left: 200px;
+  flex: 1;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 22px;
+  color: #1a2e44;
+}
+
+.subtitulo {
+  color: #888;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+/* ---- tabs ---- */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #c8ddd0;
+  margin-bottom: 25px;
+}
+
+.tabs a {
+  text-decoration: none;
+  padding: 10px 18px;
+  font-size: 13px;
+  color: #888;
+}
+
+.tabs a.tab-activo {
+  color: #4caf7d;
+  border-bottom: 2px solid #4caf7d;
+  margin-bottom: -2px;
+  font-weight: bold;
+}
+
+.tabs a:hover { color: #4caf7d; }
+
+/* ---- tarjeta ---- */
+.tarjeta {
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 16px;
+}
+
+/* ---- tabla ---- */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabla-header {
+  background-color: #f0f5f2;
+  color: #1a2e44;
+  font-weight: bold;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #c8ddd0;
+}
+
+.tabla-fila td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+}
+
+.tabla-fila:hover td {
+  background-color: #f9fdf9;
+}

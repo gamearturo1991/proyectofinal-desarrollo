@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+  <h:outputStylesheet library="styles" name="catalogos_agregar_catalogo.css"/>
+  <title>Agregar Categoría</title>
+</h:head>
+
+<h:body>
+
+  <!-- sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <a href="#">Dashboard</a>
+    <div class="sidebar-seccion">Inventario</div>
+    <a href="agregar_producto.xhtml">Productos</a>
+    <a href="agregar_categoria.xhtml" class="activo">Categorias</a>
+  </div>
+
+  <!-- contenido -->
+  <div class="contenido">
+
+    <h1>Gestión de Categorías</h1>
+    <p class="subtitulo">Administra las categorías de productos</p>
+
+    <h:form>
+
+      <!-- tabs -->
+      <div class="tabs">
+        <a href="listar_categoria.xhtml">Lista de categorias</a>
+        <a href="javascript:void(0)" class="tab-activo">Agregar Categoria</a>
+        <a href="editar_categoria.xhtml">Editar Categoria</a>
+      </div>
+      <h:messages styleClass="mensajes-exito" globalOnly="true" showSummary="true" showDetail="false"/>
+
+      <!-- fila titulo con botones -->
+      <div class="fila-titulo">
+        <h2>Agregar Categoría</h2>
+        <div>
+          <h:commandButton value="Cancelar"
+                           styleClass="btn-cancelar"
+                           immediate="true"
+                           action="agregar_categoria.xhtml?faces-redirect=true" />
+          <h:commandButton value="✔ Guardar Categoría"
+                           styleClass="btn-guardar"
+                           action="#{categoriaBean.guardarCategoria}" />
+        </div>
+      </div>
+
+      <!-- dos columnas -->
+      <div class="dos-columnas">
+
+        <!-- columna izquierda -->
+        <div class="col-izquierda">
+          <div class="tarjeta">
+            <h3>Información de la Categoría</h3>
+
+            <div class="campo-solo">
+              <label>Nombre de la Categoría <span class="requerido">*</span></label>
+              <h:inputText id="nombre"
+                           value="#{categoriaBean.nombre}"
+                           required="true"
+                           requiredMessage="El nombre es obligatorio"
+                           placeholder="Ej. Bebidas, Snacks, Lácteos..."
+                           styleClass="input-campo" />
+              <h:message for="nombre" styleClass="error-campo" />
+            </div>
+
+            <div class="campo-solo">
+              <label>Descripción <span style="color:#aaa; font-weight:normal;">(Opcional)</span></label>
+              <h:inputTextarea id="descripcion"
+                               value="#{categoriaBean.descripcion}"
+                               rows="3"
+                               placeholder="Descripción corta de la categoría"
+                               styleClass="input-campo" />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- columna derecha -->
+        <div class="col-derecha">
+          <div class="tarjeta">
+            <div class="fila-toggle">
+              <div class="toggle-texto">
+                <p>Categoría Activa</p>
+                <small>Visible en punto de venta</small>
+              </div>
+              <label class="switch">
+                <h:selectBooleanCheckbox value="#{categoriaBean.activo}" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </h:form>
+  </div>
+
+</h:body>
+</html>

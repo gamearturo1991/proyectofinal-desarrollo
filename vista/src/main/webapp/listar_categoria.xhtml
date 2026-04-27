@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+  <h:outputStylesheet library="styles" name="catalogos_listar_catalogo.css"/>
+  <title>Listar Categorías</title>
+</h:head>
+
+<h:body>
+
+  <!-- sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <a href="#">Dashboard</a>
+    <div class="sidebar-seccion">Inventario</div>
+    <a href="agregar_producto.xhtml">Productos</a>
+    <a href="lista_categorias.xhtml" class="activo">Categorias</a>
+  </div>
+
+  <!-- contenido -->
+  <div class="contenido">
+
+    <h1>Gestión de Categorías</h1>
+    <p class="subtitulo">Administra las categorías de productos</p>
+
+    <!-- tabs -->
+    <div class="tabs">
+      <a href="lista_categorias.xhtml" class="tab-activo">Lista de categorias</a>
+      <a href="agregar_categoria.xhtml">Agregar Categoria</a>
+      <a href="editar_categoria.xhtml">Editar Categoria</a>
+    </div>
+
+    <!-- tabla -->
+    <div class="tarjeta">
+      <h:dataTable value="#{categoriaBean.categorias}"
+                   var="cat"
+                   styleClass="tabla"
+                   headerClass="tabla-header"
+                   rowClasses="tabla-fila">
+
+        <h:column>
+          <f:facet name="header">ID</f:facet>
+          #{cat.categoriaId}
+        </h:column>
+
+        <h:column>
+          <f:facet name="header">Nombre</f:facet>
+          #{cat.nombre}
+        </h:column>
+
+        <h:column>
+          <f:facet name="header">Descripción</f:facet>
+          #{cat.descripcion}
+        </h:column>
+
+        <h:column>
+          <f:facet name="header">Activo</f:facet>
+          #{cat.activo ? 'Sí' : 'No'}
+        </h:column>
+
+      </h:dataTable>
+    </div>
+
+  </div>
+
+</h:body>
+</html>
