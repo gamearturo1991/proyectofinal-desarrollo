@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+  <meta charset="UTF-8"/>
+  <title>Lista de Productos</title>
+  <h:outputStylesheet library="styles" name="productos_agregar_producto.css"/>
+</h:head>
+
+<h:body>
+
+  <!-- sidebar fijo -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <a href="#">Dashboard</a>
+
+    <div class="sidebar-seccion">Inventario</div>
+    <a href="lista_productos.xhtml" class="activo">Productos</a>
+  </div>
+
+  <!-- contenido desplazable -->
+  <div class="contenido">
+
+    <h:form id="formLista">
+
+      <h:messages globalOnly="true"
+                  styleClass="mensajes-error"
+                  showDetail="true"
+                  showSummary="false"/>
+
+      <h1>Gestion de Productos</h1>
+      <p class="subtitulo">Productos activos en el sistema</p>
+
+      <div class="tabs">
+        <a href="lista_productos.xhtml" class="tab-activo">Lista de Productos</a>
+        <a href="agregar_producto.xhtml">Agregar Producto</a>
+      </div>
+
+      <div class="fila-titulo">
+        <h2>Lista de Productos</h2>
+      </div>
+
+      <div class="tarjeta">
+        <h:dataTable value="#{productosUI.productos}"
+                     var="p"
+                     styleClass="tabla-productos"
+                     headerClass="tabla-header"
+                     rowClasses="tabla-fila">
+
+          <h:column>
+            <f:facet name="header">SKU</f:facet>
+            #{p.sku}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">Nombre</f:facet>
+            #{p.nombre}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">Precio Venta</f:facet>
+            $#{p.precioVenta}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">Precio Compra</f:facet>
+            $#{p.precioCompra}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">Unidad</f:facet>
+            #{p.unidadMedida}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">Acciones</f:facet>
+            <h:commandButton value="Dar de Baja"
+                             styleClass="btn-cancelar"
+                             action="#{productosUI.darDeBaja}"
+                             onclick="return confirm('¿Seguro que deseas dar de baja este producto?')">
+              <f:setPropertyActionListener
+                target="#{productosUI.productoSeleccionado}"
+                value="#{p}"/>
+            </h:commandButton>
+          </h:column>
+
+        </h:dataTable>
+      </div>
+
+    </h:form>
+
+  </div>
+
+</h:body>
+</html>

@@ -17,3 +17,11 @@ public class ProductoDAO extends AbstractDAO<Producto> {
         return entityManager;
     }
 }
+
+public void darDeBaja(Integer id) {
+    find(id).ifPresent(producto -> {
+        producto.setActivo(false);
+        producto.setFechaBaja(java.time.LocalDateTime.now());
+        update(producto);
+    });
+}

@@ -4,6 +4,7 @@ import mx.swb.entity.Producto;
 import mx.swb.negocio.ProductoService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class FacadeProducto {
 
@@ -30,4 +31,13 @@ public class FacadeProducto {
             controlaCaducidad, diasAlertaCaducidad, requiereLote, activo
         );
     }
+    public void darDeBaja(Integer id) {
+        ProductoService service = new ProductoService();
+        service.darDeBaja(id);
+    }
+
+}
+public List<Producto> listarActivos() {
+    ProductoService service = new ProductoService();
+    return service.listarActivos();
 }

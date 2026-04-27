@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class ProductoService {
     private final DelegateProducto delegateProducto;
@@ -132,4 +133,14 @@ public class ProductoService {
         if (requiereLote != null && requiereLote && (controlaCaducidad == null || !controlaCaducidad))
             throw new IllegalArgumentException("Si requiere lote, debe controlar caducidad");
     }
+
+    public void darDeBaja(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID del producto es obligatorio");
+        }
+        delegateProducto.darDeBaja(id);
+    }
+}
+public List<Producto> listarActivos() {
+    return delegateProducto.listarActivos();
 }
