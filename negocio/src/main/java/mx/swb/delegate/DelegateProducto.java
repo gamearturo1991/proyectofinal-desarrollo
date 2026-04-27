@@ -29,7 +29,8 @@ public class DelegateProducto {
     public void darDeBaja(Integer id) {
         productoDAO.darDeBaja(id);
     }
-}
-public List<Producto> listarActivos() {
-    return productoDAO.findByField("activo", true);
+
+    public List<Producto> listarActivos() {
+        return productoDAO.findByField("activo", true);
+    }
 }

@@ -140,7 +140,9 @@ public class ProductoService {
         }
         delegateProducto.darDeBaja(id);
     }
-}
-public List<Producto> listarActivos() {
-    return delegateProducto.listarActivos();
+
+    public List<Producto> listarActivos() {
+        return delegateProducto.listarActivos();
+    }
+
 }
