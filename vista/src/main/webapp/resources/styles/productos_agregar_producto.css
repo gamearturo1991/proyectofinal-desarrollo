@@ -270,10 +270,23 @@ textarea {
   background-color: #fdecea;
   border: 1px solid #f5c6cb;
   border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
   font-size: 13px;
   color: #c62828;
+}
+
+.mensajes-info,
+.ui-messages-info,
+.ui-messages-info-summary,
+.ui-messages-info-detail {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  border-color: #c3e6cb !important;
+}
+
+.ui-messages-info {
+  border-left: 4px solid #28a745;
 }
 
 /* input con error (clase que JSF agrega cuando falla validacion) */
