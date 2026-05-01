@@ -1,11 +1,21 @@
 package mx.swb.facade;
 
+import mx.swb.delegate.DelegateLote;
 import mx.swb.entity.Producto;
 import mx.swb.negocio.ProductoService;
+import mx.swb.negocio.VentaService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 public class FacadeProducto {
+
+    private ProductoService service;
+
+    public FacadeProducto() {
+        service = new ProductoService();
+    }
 
     public Producto registrar(
         String codigoBarras,
@@ -20,14 +30,20 @@ public class FacadeProducto {
         Boolean controlaCaducidad,
         Integer diasAlertaCaducidad,
         Boolean requiereLote,
-        Boolean activo
+        Boolean activo,
+        Integer cantidadInicial,
+        LocalDate fechaCaducidadLote,
+        String numeroLote
     ) {
-
-        ProductoService service = new ProductoService();
         return service.registrarProducto(
             codigoBarras, sku, nombre, descripcion, unidadMedida,
             precioCompra, precioVenta, stockMinimo, stockMaximo,
-            controlaCaducidad, diasAlertaCaducidad, requiereLote, activo
+            controlaCaducidad, diasAlertaCaducidad, requiereLote, activo, cantidadInicial, fechaCaducidadLote, numeroLote
         );
+    }
+
+    public List<Producto> listarProductosActivosConStock() {
+        DelegateLote delegate = new DelegateLote();
+        return delegate.listarProductosActivosConStock();
     }
 }

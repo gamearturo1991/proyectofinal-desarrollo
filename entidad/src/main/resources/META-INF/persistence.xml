@@ -7,6 +7,12 @@
     <persistence-unit name="refresqueria_pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>mx.swb.entity.Producto</class>
+        <class>mx.swb.entity.Caja</class>
+        <class>mx.swb.entity.Lote</class>
+        <class>mx.swb.entity.DetalleVenta</class>
+        <class>mx.swb.entity.Venta</class>
+        <class>mx.swb.entity.TipoMovimientoInventario</class>
+        <class>mx.swb.entity.MovimientoInventario</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver"   value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url"      value="jdbc:mysql://localhost:3310/refresqueria?serverTimezone=UTC&amp;zeroDateTimeBehavior=convertToNull"/>

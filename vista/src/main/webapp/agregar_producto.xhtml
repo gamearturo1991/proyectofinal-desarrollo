@@ -13,13 +13,26 @@
 
 <h:body>
 
-  <!-- sidebar fijo -->
+  <!-- ═══ SIDEBAR ═══ -->
   <div class="sidebar">
     <div class="sidebar-seccion">Principal</div>
-    <a href="#">Dashboard</a>
+    <h:link outcome="dashboard" value="Dashboard"/>
+    <h:link outcome="pos"        styleClass="sidebar-link" value="Punto de Venta"/>
 
     <div class="sidebar-seccion">Inventario</div>
-    <a href="#" class="activo">Productos</a>
+    <h:link outcome="agregar_producto" styleClass="sidebar-link activo" value="Productos"/>
+    <h:link outcome="lotes"            styleClass="sidebar-link" value="Lotes"/>
+    <h:link outcome="movimientos"      styleClass="sidebar-link" value="Movimientos"/>
+    <h:link outcome="categorias"       styleClass="sidebar-link" value="Categorias"/>
+
+    <div class="sidebar-seccion">Compras</div>
+    <h:link outcome="compras"     styleClass="sidebar-link" value="Compras"/>
+    <h:link outcome="proveedores" styleClass="sidebar-link" value="Proveedores"/>
+
+    <div class="sidebar-seccion">Operaciones</div>
+    <h:link outcome="ventas"     styleClass="sidebar-link" value="Ventas"/>
+    <h:link outcome="cajas"      styleClass="sidebar-link" value="Cajas"/>
+    <h:link outcome="alertas"    styleClass="sidebar-link" value="Alertas"/>
   </div>
 
   <!-- contenido desplazable -->
@@ -27,10 +40,13 @@
 
     <h:form id="formProducto">
 
-      <h:messages globalOnly="false"
-                  styleClass="mensajes-error"
-                  showDetail="true"
-                  showSummary="false"/>
+      <h:messages globalOnly="true"
+                  styleClass="mensajes"
+                  infoClass="mensajes-info"
+                  errorClass="mensajes-error"
+                  warnClass="mensajes-warn"
+                  fatalClass="mensajes-fatal"
+                  showDetail="true" showSummary="false"/>
 
       <h1>Gestion de Productos</h1>
       <p class="subtitulo">Agregar nuevo producto</p>

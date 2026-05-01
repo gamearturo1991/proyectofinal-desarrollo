@@ -12,15 +12,15 @@ public class DelegateProducto {
         this.productoDAO = ServiceLocator.getInstanceProductoDAO();
     }
 
-    public void guardar(Producto producto) {
-        productoDAO.save(producto);
-    }
-
     public Producto buscarPorSku(String sku) {
         return productoDAO.findByOneParameterUnique(sku, "sku");
     }
 
     public Producto buscarPorCodigoBarras(String codigoBarras) {
         return productoDAO.findByOneParameterUnique(codigoBarras, "codigoBarras");
+    }
+
+    public void guardar(Producto producto) {
+        productoDAO.save(producto);
     }
 }
