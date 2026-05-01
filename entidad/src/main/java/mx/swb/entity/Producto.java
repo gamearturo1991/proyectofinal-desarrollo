@@ -18,7 +18,6 @@ public class Producto {
     @Column(name = "producto_id", nullable = false)
     private Integer id;
 
-    // nullable = true, unique -- se limpia a null si viene vacio
     @Size(max = 50)
     @Column(name = "codigo_barras", length = 50, unique = true)
     private String codigoBarras;
@@ -87,6 +86,9 @@ public class Producto {
     @Column(name = "fecha_actualizado", nullable = false)
     private LocalDateTime fechaActualizado;
 
+    @Transient
+    private int stockActual;
+
     @PrePersist
     public void prePersist() {
         ZoneId tijuana = ZoneId.of("America/Tijuana");
@@ -95,7 +97,7 @@ public class Producto {
         this.fechaCreado     = ahora;
         this.fechaActualizado = ahora;
 
-        // limpiar campos opcionales unicos para evitar Duplicate entry ''
+        // limpiar campos opcionales unicos
         if (this.codigoBarras != null && this.codigoBarras.trim().isEmpty()) {
             this.codigoBarras = null;
         }
@@ -117,8 +119,6 @@ public class Producto {
             this.codigoBarras = null;
         }
     }
-
-    // Getters y Setters
 
     public Integer getId() {
         return id;
@@ -254,5 +254,13 @@ public class Producto {
 
     public void setFechaActualizado(LocalDateTime fechaActualizado) {
         this.fechaActualizado = fechaActualizado;
+    }
+
+    public int getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(int stockActual) {
+        this.stockActual = stockActual;
     }
 }
