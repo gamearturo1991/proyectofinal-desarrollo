@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+  <meta charset="UTF-8"/>
+  <title>Punto de Venta</title>
+  <h:outputStylesheet library="styles" name="productos_agregar_producto.css"/>
+  <h:outputStylesheet library="styles" name="pos.css"/>
+</h:head>
+
+<h:body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <h:link outcome="dashboard" value="Dashboard"/>
+    <h:link outcome="pos" styleClass="activo" value="Punto de Venta"/>
+
+    <div class="sidebar-seccion">Inventario</div>
+    <h:link outcome="agregar_producto" value="Productos"/>
+    <h:link outcome="lotes"            value="Lotes"/>
+    <h:link outcome="movimientos"      value="Movimientos"/>
+    <h:link outcome="categorias"       value="Categorias"/>
+
+    <div class="sidebar-seccion">Compras</div>
+    <h:link outcome="compras"     value="Compras"/>
+    <h:link outcome="proveedores" value="Proveedores"/>
+
+    <div class="sidebar-seccion">Operaciones</div>
+    <h:link outcome="ventas"  value="Ventas"/>
+    <h:link outcome="cajas"   value="Cajas"/>
+    <h:link outcome="alertas" value="Alertas"/>
+  </div>
+
+  <div class="contenido">
+
+    <h1>Punto de Venta</h1>
+    <p class="subtitulo">Cajas de Ventas</p>
+
+    <h:form id="formPOS">
+
+      <!-- Mensajes globales -->
+      <h:panelGroup id="mensajes-panel" layout="block">
+        <h:messages globalOnly="true"
+                    styleClass="mensajes"
+                    infoClass="mensajes-info"
+                    errorClass="mensajes-error"
+                    warnClass="mensajes-warn"
+                    fatalClass="mensajes-fatal"
+                    showDetail="true" showSummary="false"/>
+      </h:panelGroup>
+
+      <!-- Barra info caja activa -->
+      <div class="pos-caja-barra">
+        <div class="pos-caja-badge">
+          <span class="pos-caja-nombre">Caja #{ventaBeanUI.cajaActiva != null ? ventaBeanUI.cajaActiva.id : '--'}</span>
+          <span class="pos-caja-estado">#{ventaBeanUI.cajaActiva != null ? ventaBeanUI.cajaActiva.estado : 'Cerrada'}</span>
+        </div>
+        <span class="pos-caja-info">
+          Apertura: $#{ventaBeanUI.cajaActiva != null ? ventaBeanUI.cajaActiva.montoApertura : '0.00'},
+          Ventas hoy: #{ventaBeanUI.ventasDelDia}
+        </span>
+
+        <ui:fragment rendered="#{ventaBeanUI.cajaActiva == null}">
+          <h:inputText value="#{ventaBeanUI.montoApertura}" placeholder="Monto apertura" size="10"/>
+          <h:commandButton value="Abrir Caja" styleClass="btn-cerrar-caja" action="#{ventaBeanUI.abrirCaja}">
+            <f:ajax execute="@form" render="@form"/>
+          </h:commandButton>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{ventaBeanUI.cajaActiva != null}">
+          <h:inputText value="#{ventaBeanUI.montoCierre}" placeholder="Monto cierre" size="5"/>
+          <h:commandButton value="Cerrar Caja X" styleClass="btn-cerrar-caja" action="#{ventaBeanUI.cerrarCaja}">
+            <f:ajax execute="@form" render="@form"/>
+          </h:commandButton>
+        </ui:fragment>
+      </div>
+
+      <!-- catalogo y carrito -->
+      <div class="pos-layout">
+
+        <!-- Izquierda: buscador y grid-->
+        <div class="pos-catalogo">
+
+          <div class="pos-buscador">
+            <div class="pos-search-wrap">
+              <h:inputText id="filtroNombre"
+                           value="#{ventaBeanUI.filtroNombre}"
+                           styleClass="pos-search-input"
+                           placeholder="Buscar producto o escanear código de barras...">
+                <f:ajax event="keyup" listener="#{ventaBeanUI.filtrarProductos}"
+                        render="grid-productos mensajes-panel" delay="500"/>
+              </h:inputText>
+            </div>
+
+          </div>
+
+          <div class="pos-grid" id="grid-productos">
+            <ui:repeat value="#{ventaBeanUI.productosCatalogo}" var="prod">
+              <div class="pos-prod-card #{prod.stockActual le 0 ? 'pos-prod-card-agotado' : ''}">
+                <div class="pos-prod-nombre">#{prod.nombre}</div>
+                <div class="pos-prod-sku">#{prod.sku}</div>
+                <div class="pos-prod-barras">#{prod.codigoBarras}</div>
+                <div class="pos-prod-footer">
+                <span class="pos-prod-precio">
+                    $<h:outputText value="#{prod.precioVenta}">
+                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    </h:outputText>
+                </span>
+                  <span class="badge #{prod.stockActual le 0 ? 'badge-out' : (prod.stockActual le prod.stockMinimo ? 'badge-low' : 'badge-ok')}">
+                    <h:outputText value="#{prod.stockActual}"/> pzas
+                </span>
+                </div>
+                <h:commandButton value="#{prod.stockActual le 0 ? 'Agotado' : '+ Agregar'}"
+                                 styleClass="btn-agregar-prod #{prod.stockActual le 0 ? 'btn-agregar-deshabilitado' : ''}"
+                                 disabled="#{prod.stockActual le 0}"
+                                 action="#{ventaBeanUI.agregarProducto(prod.id, prod.nombre, prod.precioVenta)}">
+                  <f:ajax render=":formPOS:carrito-panel :formPOS:totales-panel :formPOS:mensajes-panel :formPOS:totalItemsText"/>
+                </h:commandButton>
+              </div>
+            </ui:repeat>
+            <ui:fragment rendered="#{empty ventaBeanUI.productosCatalogo}">
+              <div class="carrito-vacio" style="width:100%; text-align:center; grid-column:1/-1;">
+                No se encontraron productos.
+              </div>
+            </ui:fragment>
+          </div>
+        </div>
+
+        <!-- Derecha: carrito -->
+        <div class="pos-carrito-panel">
+
+          <!-- Header: titulo + contador + vaciar -->
+          <div class="carrito-header">
+            <span class="carrito-titulo">Carrito</span>
+            <div class="carrito-header-right">
+                            <span class="carrito-contador">
+                                <h:outputText id="totalItemsText"
+                                              value="#{ventaBeanUI.totalItems}"/> Productos
+                            </span>
+              <h:commandButton value="&#128465;"
+                               styleClass="btn-vaciar-icono"
+                               title="Vaciar carrito"
+                               action="#{ventaBeanUI.limpiarCarrito}"
+                               immediate="true">
+                <f:ajax render=":formPOS:carrito-panel :formPOS:totales-panel :formPOS:mensajes-panel :formPOS:totalItemsText"/>
+              </h:commandButton>
+            </div>
+          </div>
+
+          <!-- Cliente opcional -->
+          <div class="carrito-seccion">
+            <h:inputText id="clienteNombre"
+                         value="#{ventaBeanUI.clienteNombre}"
+                         styleClass="pos-input-cliente"
+                         placeholder="Nombre del Cliente (Opcional)"/>
+          </div>
+
+          <!-- Items del carrito -->
+          <h:panelGroup id="carrito-panel" layout="block">
+            <div class="carrito-items">
+              <ui:fragment rendered="#{empty ventaBeanUI.carrito}">
+                <div class="carrito-vacio">Carrito vacio</div>
+              </ui:fragment>
+              <ui:fragment rendered="#{not empty ventaBeanUI.carrito}">
+                <ui:repeat value="#{ventaBeanUI.carrito}" var="item">
+                  <div class="carrito-item">
+                    <div class="ci-info">
+                      <div class="ci-nombre">
+                        <h:outputText value="#{item.nombre}"/>
+                      </div>
+                      <div class="ci-precio">
+                        $<h:outputText value="#{item.precioUnitario}">
+                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                      </h:outputText> c/u
+                      </div>
+                    </div>
+                    <div class="ci-controles">
+                      <!-- resta 1; si llega a 0 elimina el item -->
+                      <h:commandButton value="-"
+                                       styleClass="ci-qty-btn"
+                                       action="#{ventaBeanUI.disminuirCantidad(item.productoId)}">
+                        <f:ajax render=":formPOS:carrito-panel :formPOS:totales-panel :formPOS:mensajes-panel :formPOS:totalItemsText"/>
+                      </h:commandButton>
+                      <span class="ci-qty">
+                                                <h:outputText value="#{item.cantidad}"/>
+                                            </span>
+                      <!-- suma 1 unidad -->
+                      <h:commandButton value="+"
+                                       styleClass="ci-qty-btn"
+                                       action="#{ventaBeanUI.aumentarCantidad(item.productoId)}">
+                        <f:ajax render=":formPOS:carrito-panel :formPOS:totales-panel :formPOS:mensajes-panel :formPOS:totalItemsText"/>
+                      </h:commandButton>
+                    </div>
+                    <span class="ci-subtotal">
+                                            $<h:outputText value="#{item.subtotal}">
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                            </h:outputText>
+                                        </span>
+                    <!-- X elimina toda la cantidad del producto -->
+                    <h:commandButton value="X"
+                                     styleClass="ci-btn-eliminar"
+                                     action="#{ventaBeanUI.eliminarItem(item.productoId)}">
+                      <f:ajax render=":formPOS:carrito-panel :formPOS:totales-panel :formPOS:mensajes-panel :formPOS:totalItemsText"/>
+                    </h:commandButton>
+                  </div>
+                </ui:repeat>
+              </ui:fragment>
+            </div>
+          </h:panelGroup>
+
+          <!-- Descuento e impuesto -->
+          <div class="carrito-seccion pos-ajustes">
+            <div class="pos-ajuste-item">
+              <label>Descuento</label>
+              <h:inputText id="descuento"
+                           value="#{ventaBeanUI.descuentoGlobal}"
+                           styleClass="pos-input-num"
+                           placeholder="0">
+                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                <f:ajax event="change" render="totales-panel"/>
+              </h:inputText>
+            </div>
+            <div class="pos-ajuste-item">
+              <label>Impuesto %</label>
+              <h:inputText id="impuesto"
+                           value="#{ventaBeanUI.impuestoPorcentaje}"
+                           styleClass="pos-input-num"
+                           placeholder="0">
+                <f:convertNumber minFractionDigits="1" maxFractionDigits="2"/>
+                <f:ajax event="change" render="totales-panel"/>
+              </h:inputText>
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <h:panelGroup id="totales-panel" layout="block">
+            <div class="pos-totales">
+              <div class="pos-total-fila">
+                <span>Subtotal</span>
+                <span>$<h:outputText value="#{ventaBeanUI.subtotal}">
+                                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                </h:outputText></span>
+              </div>
+              <div class="pos-total-fila pos-total-descuento">
+                <span>Descuento</span>
+                <span>-$<h:outputText value="#{ventaBeanUI.descuentoAplicado}">
+                                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                </h:outputText></span>
+              </div>
+              <div class="pos-total-fila">
+                <span>Impuesto</span>
+                <span>$<h:outputText value="#{ventaBeanUI.impuestoCalculado}">
+                                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                </h:outputText></span>
+              </div>
+              <div class="pos-total-fila pos-total-grande">
+                <span>TOTAL</span>
+                <span>$<h:outputText value="#{ventaBeanUI.total}">
+                                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                </h:outputText></span>
+              </div>
+            </div>
+          </h:panelGroup>
+
+          <!-- Metodo de pago: chips -->
+          <div class="carrito-seccion">
+            <div class="pos-metodo-label">Metodo de Pago</div>
+            <div class="pos-metodo-btns">
+              <h:commandButton value="Efectivo"
+                               styleClass="#{ventaBeanUI.metodoPago.name() == 'efectivo'
+                                                         ? 'btn-metodo btn-metodo-activo'
+                                                         : 'btn-metodo'}"
+                               action="#{ventaBeanUI.setMetodoPago(ventaBeanUI.metodosPago[0])}">
+                <f:ajax render="monto-recibido-panel"/>
+              </h:commandButton>
+              <h:commandButton value="Tarjeta"
+                               styleClass="#{ventaBeanUI.metodoPago.name() == 'tarjeta'
+                                                         ? 'btn-metodo btn-metodo-activo'
+                                                         : 'btn-metodo'}"
+                               action="#{ventaBeanUI.setMetodoPago(ventaBeanUI.metodosPago[1])}">
+                <f:ajax render="monto-recibido-panel"/>
+              </h:commandButton>
+              <h:commandButton value="Transferencia"
+                               styleClass="#{ventaBeanUI.metodoPago.name() == 'transferencia'
+                                                         ? 'btn-metodo btn-metodo-activo'
+                                                         : 'btn-metodo'}"
+                               action="#{ventaBeanUI.setMetodoPago(ventaBeanUI.metodosPago[2])}">
+                <f:ajax render="monto-recibido-panel"/>
+              </h:commandButton>
+            </div>
+          </div>
+
+          <!-- Monto recibido y cambio  -->
+          <h:panelGroup id="monto-recibido-panel" layout="block">
+            <ui:fragment rendered="#{ventaBeanUI.efectivo}">
+              <div class="carrito-seccion">
+                <div class="pos-fila-monto">
+                  <span>Monto Recibido</span>
+                  <h:inputText id="montoRecibido"
+                               value="#{ventaBeanUI.montoRecibido}"
+                               styleClass="pos-input-monto"
+                               placeholder="0.00">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                    <!-- Actualiza el cambio en tiempo real al salir del campo -->
+                    <f:ajax event="change" render="cambio-panel"/>
+                  </h:inputText>
+                </div>
+                <h:panelGroup id="cambio-panel" layout="block">
+                  <div class="pos-fila-monto pos-fila-cambio">
+                    <span>Cambio</span>
+                    <span class="pos-cambio-valor">
+                        $<h:outputText value="#{ventaBeanUI.cambio}">
+                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                        </h:outputText>
+                    </span>
+                  </div>
+                </h:panelGroup>
+              </div>
+            </ui:fragment>
+          </h:panelGroup>
+          <h:commandButton id="btnCobrar"
+                           value="Cobrar  &#10003;"
+                           styleClass="btn-cobrar"
+                           action="#{ventaBeanUI.registrarVenta}">
+            <f:ajax execute="@form"
+                    render="carrito-panel totales-panel
+                                        monto-recibido-panel mensajes-panel"/>
+          </h:commandButton>
+
+        </div>
+      </div>
+
+    </h:form>
+  </div>
+
+</h:body>
+</html>
