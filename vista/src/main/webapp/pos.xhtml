@@ -17,7 +17,7 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-seccion">Principal</div>
-    <h:link outcome="dashboard" value="Dashboard"/>
+    <h:link outcome="index" value="Dashboard"/>
     <h:link outcome="pos" styleClass="activo" value="Punto de Venta"/>
 
     <div class="sidebar-seccion">Inventario</div>
@@ -115,7 +115,7 @@
                     <h:outputText value="#{prod.stockActual}"/> pzas
                 </span>
                 </div>
-                <h:commandButton value="#{prod.stockActual le 0 ? 'Agotado' : '+ Agregar'}"
+                <h:commandButton id="btnCobrar" value="#{prod.stockActual le 0 ? 'Agotado' : '+ Agregar'}"
                                  styleClass="btn-agregar-prod #{prod.stockActual le 0 ? 'btn-agregar-deshabilitado' : ''}"
                                  disabled="#{prod.stockActual le 0}"
                                  action="#{ventaBeanUI.agregarProducto(prod.id, prod.nombre, prod.precioVenta)}">
