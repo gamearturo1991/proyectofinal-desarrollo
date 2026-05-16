@@ -4,15 +4,34 @@
       xmlns:h="jakarta.faces.html">
 
 <h:head>
-  <title>Inicio</title>
+  <meta charset="UTF-8"/>
+  <title>Punto de Venta</title>
+  <h:outputStylesheet library="styles" name="productos_agregar_producto.css"/>
+  <h:outputStylesheet library="styles" name="pos.css"/>
 </h:head>
 
 <h:body>
 
-  <h2>Bienvenido</h2>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <h:link outcome="index" styleClass="activo" value="Dashboard"/>
+    <h:link outcome="pos" value="Punto de Venta"/>
 
-  <h:link value="Ir a Agregar Producto"
-          outcome="agregar_producto" />
+    <div class="sidebar-seccion">Inventario</div>
+    <h:link outcome="agregar_producto" value="Productos"/>
+    <h:link outcome="lotes"            value="Lotes"/>
+    <h:link outcome="movimientos"      value="Movimientos"/>
+    <h:link outcome="categorias"       value="Categorias"/>
 
+    <div class="sidebar-seccion">Compras</div>
+    <h:link outcome="compras"     value="Compras"/>
+    <h:link outcome="proveedores" value="Proveedores"/>
+
+    <div class="sidebar-seccion">Operaciones</div>
+    <h:link outcome="ventas"  value="Ventas"/>
+    <h:link outcome="cajas"   value="Cajas"/>
+    <h:link outcome="alertas" value="Alertas"/>
+  </div>
 </h:body>
 </html>
