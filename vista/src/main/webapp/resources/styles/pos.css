@@ -620,14 +620,16 @@
 .badge-out   { background: rgba(229,57,53,.12);   color: #b71c1c; }
 .badge-blue  { background: rgba(30,136,229,.12);  color: #0d47a1; font-size: 12px; font-weight: 600; }
 
-/* Mensajes error */
+/* ── Mensajes ── */
+.mensajes { margin-bottom: 12px; }
+
 .mensajes-error {
   display: block;
   background-color: #fdecea;
   border: 1px solid #f5c6cb;
   border-radius: 8px;
   padding: 10px 14px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   font-size: 13px;
   color: #c62828;
 }
@@ -636,13 +638,37 @@
 .ui-messages-info,
 .ui-messages-info-summary,
 .ui-messages-info-detail {
-  background-color: #d4edda !important;
-  color: #155724 !important;
-  border-color: #c3e6cb !important;
+  display: block;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #155724;
 }
 
-.ui-messages-info {
-  border-left: 4px solid #28a745;
+.mensajes-warn {
+  display: block;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #856404;
+}
+
+.mensajes-fatal {
+  display: block;
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #842029;
+  font-weight: bold;
 }
 
 /* Scrollbar */
