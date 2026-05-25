@@ -9,8 +9,8 @@ import mx.swb.integration.ServiceLocator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class VentaService {
 
@@ -178,8 +178,173 @@ public class VentaService {
         return venta;
     }
 
+    public void editarVenta(Integer ventaId, List<ItemEdicionDTO> items, BigDecimal montoRecibido) {
+        if (ventaId == null)
+            throw new IllegalArgumentException("El ID de venta es obligatorio");
+        if (items == null || items.isEmpty())
+            throw new IllegalArgumentException("La venta debe tener al menos un item");
+
+        // 1. Cargar la venta
+        Venta venta = delegateVenta.buscarVentaPorId(ventaId);
+        if (venta == null)
+            throw new IllegalArgumentException("No se encontro la venta #" + ventaId);
+
+        if (venta.getEstado() == Venta.Estado.cancelada)
+            throw new IllegalStateException("No se puede editar una venta cancelada");
+
+        // 2. Tipos de movimiento
+        TipoMovimientoInventario tipoSalida    = delegateMovimientoInventario.buscarTipoMovimiento("salida_venta");
+        TipoMovimientoInventario tipoDevolucion = delegateMovimientoInventario.buscarTipoMovimiento("devolucion_venta");
+
+        EntityManager em = ServiceLocator.getEntityManager();
+
+        for (ItemEdicionDTO item : items) {
+            int delta = item.getDeltaCantidad();
+            if (delta == 0) continue; // sin cambios
+
+            int stockActual = delegateLote.obtenerStockActual(item.getProductoId());
+            Producto producto = em.find(Producto.class, item.getProductoId());
+            Lote loteUsado = null;
+
+            if (delta > 0) {
+                // Se agregaron unidades: validar stock y descontar
+                if (stockActual < delta)
+                    throw new IllegalStateException(
+                        "Stock insuficiente para " + item.getNombreProducto() +
+                        " — disponible: " + stockActual + ", adicional solicitado: " + delta);
+
+                int restante = delta;
+                List<Lote> lotes = delegateLote.obtenerLotesActivosPorProducto(item.getProductoId());
+                for (Lote lote : lotes) {
+                    if (restante <= 0) break;
+                    int descontar = Math.min(restante, lote.getCantidadActual());
+                    lote.setCantidadActual(lote.getCantidadActual() - descontar);
+                    delegateLote.actualizarLote(lote);
+                    restante  -= descontar;
+                    loteUsado  = lote;
+                }
+
+                if (tipoSalida != null) {
+                    MovimientoInventario mov = new MovimientoInventario();
+                    mov.setUsuario(venta.getUsuario());
+                    mov.setProducto(producto);
+                    mov.setTipoMovimiento(tipoSalida);
+                    mov.setLote(loteUsado);
+                    mov.setVenta(venta);
+                    mov.setCantidad(delta);
+                    mov.setPrecioUnitario(item.getPrecioUnitario() != null
+                        ? item.getPrecioUnitario() : BigDecimal.ZERO);
+                    mov.setStockAntes(stockActual);
+                    mov.setStockDespues(stockActual - delta);
+                    mov.setObservacion("Ajuste por edicion de venta #" + ventaId);
+                    delegateMovimientoInventario.guardar(mov);
+                }
+
+            } else {
+                // Delta < 0: se quitaron unidades, devolver al lote
+                int unidadesDevolver = Math.abs(delta);
+                List<Lote> lotes = delegateLote.obtenerLotesActivosPorProducto(item.getProductoId());
+
+                if (!lotes.isEmpty()) {
+                    loteUsado = lotes.get(0);
+                    loteUsado.setCantidadActual(loteUsado.getCantidadActual() + unidadesDevolver);
+                    delegateLote.actualizarLote(loteUsado);
+                } else {
+                    List<Lote> todosLotes = delegateLote.obtenerTodosLotesPorProducto(item.getProductoId());
+                    if (!todosLotes.isEmpty()) {
+                        loteUsado = todosLotes.get(0);
+                        loteUsado.setCantidadActual(loteUsado.getCantidadActual() + unidadesDevolver);
+                        delegateLote.actualizarLote(loteUsado);
+                    }
+                }
+
+                TipoMovimientoInventario tipoMov = tipoDevolucion != null ? tipoDevolucion : tipoSalida;
+                if (tipoMov != null) {
+                    MovimientoInventario mov = new MovimientoInventario();
+                    mov.setUsuario(venta.getUsuario());
+                    mov.setProducto(producto);
+                    mov.setTipoMovimiento(tipoMov);
+                    mov.setLote(loteUsado);
+                    mov.setVenta(venta);
+                    mov.setCantidad(unidadesDevolver);
+                    mov.setPrecioUnitario(item.getPrecioUnitario() != null
+                        ? item.getPrecioUnitario() : BigDecimal.ZERO);
+                    mov.setStockAntes(stockActual);
+                    mov.setStockDespues(stockActual + unidadesDevolver);
+                    mov.setObservacion("Devolucion por edicion de venta #" + ventaId);
+                    delegateMovimientoInventario.guardar(mov);
+                }
+            }
+
+            // 3. Actualizar la colección de detalles
+            if (item.getDetalleId() != null) {
+                // Detalle existente: encontrar en la colección y actualizar o quitar
+                Optional<DetalleVenta> existente = venta.getDetalles().stream()
+                    .filter(d -> d.getId().equals(item.getDetalleId()))
+                    .findFirst();
+                if (existente.isPresent()) {
+                    DetalleVenta d = existente.get();
+                    if (item.isEliminado() || item.getCantidad() <= 0) {
+                        venta.getDetalles().remove(d);
+                    } else {
+                        d.setCantidad(item.getCantidad());
+                        d.setSubtotal(item.getPrecioUnitario()
+                            .multiply(BigDecimal.valueOf(item.getCantidad()))
+                            .setScale(2, RoundingMode.HALF_UP));
+                    }
+                }
+            } else if (!item.isEliminado() && item.getCantidad() > 0) {
+                // Producto nuevo: crear detalle y añadir a la colección
+                DetalleVenta nuevo = new DetalleVenta();
+                nuevo.setVenta(venta);
+                nuevo.setProducto(producto);
+                nuevo.setLote(loteUsado);
+                nuevo.setCantidad(item.getCantidad());
+                nuevo.setPrecioUnitario(item.getPrecioUnitario());
+                nuevo.setDescuentoUnitario(BigDecimal.ZERO);
+                nuevo.setSubtotal(item.getPrecioUnitario()
+                    .multiply(BigDecimal.valueOf(item.getCantidad()))
+                    .setScale(2, RoundingMode.HALF_UP));
+                venta.getDetalles().add(nuevo);
+            }
+        }
+
+        // 4. Recalcular totales
+        BigDecimal nuevoSubtotal = items.stream()
+            .filter(i -> !i.isEliminado() && i.getCantidad() > 0)
+            .map(i -> {
+                BigDecimal precio = i.getPrecioUnitario() != null
+                    ? i.getPrecioUnitario() : BigDecimal.ZERO;
+                return precio.multiply(BigDecimal.valueOf(i.getCantidad()));
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal descuento = venta.getDescuento() != null
+            ? venta.getDescuento() : BigDecimal.ZERO;
+        BigDecimal impuesto  = venta.getImpuesto()  != null
+            ? venta.getImpuesto()  : BigDecimal.ZERO;
+        BigDecimal base      = nuevoSubtotal.subtract(descuento).max(BigDecimal.ZERO);
+        BigDecimal totalFinal = base.add(impuesto).setScale(2, RoundingMode.HALF_UP);
+
+        venta.setSubtotal(nuevoSubtotal.setScale(2, RoundingMode.HALF_UP));
+        venta.setTotal(totalFinal);
+
+        if (venta.getMetodoPago() == Venta.MetodoPago.efectivo && montoRecibido != null) {
+            venta.setMontoRecibido(montoRecibido.setScale(2, RoundingMode.HALF_UP));
+            BigDecimal cambio = montoRecibido.subtract(totalFinal).max(BigDecimal.ZERO);
+            venta.setMontoCambio(cambio.setScale(2, RoundingMode.HALF_UP));
+        }
+
+        // 5. Un único merge aplica en cascada todos los cambios de la colección de detalles
+        delegateVenta.actualizarVenta(venta);
+    }
+
     public List<Venta> obtenerVentasHoy() {
         return delegateVenta.obtenerVentasHoy();
+    }
+
+    public List<Venta> obtenerTodasVentas() {
+        return delegateVenta.obtenerTodasVentas();
     }
 
     public List<Venta> obtenerVentasPorCaja(Integer cajaId) {
