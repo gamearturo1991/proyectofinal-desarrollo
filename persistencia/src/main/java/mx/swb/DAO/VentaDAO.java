@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManager;
 import mx.swb.persistence.AbstractDAO;
 import mx.swb.entity.Venta;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 public class VentaDAO extends AbstractDAO<Venta> {
@@ -33,11 +36,33 @@ public class VentaDAO extends AbstractDAO<Venta> {
 
     // Ventas del dia
     public List<Venta> findHoy() {
-        return execute(em ->
-            em.createQuery(
-                    "SELECT v FROM Venta v WHERE CAST(v.fechaCreado AS date) = CURRENT_DATE ORDER BY v.fechaCreado DESC",
+        return execute(em -> {
+            ZoneId tijuana = ZoneId.of("America/Tijuana");
+            LocalDateTime inicio = LocalDate.now(tijuana).atStartOfDay();
+            LocalDateTime fin    = inicio.plusDays(1);
+            return em.createQuery(
+                    "SELECT DISTINCT v FROM Venta v " +
+                        "LEFT JOIN FETCH v.detalles d " +
+                        "LEFT JOIN FETCH d.producto " +
+                        "WHERE v.fechaCreado >= :inicio " +
+                        "AND v.fechaCreado < :fin " +
+                        "ORDER BY v.fechaCreado DESC",
                     Venta.class)
-                .getResultList()
-        );
+                .setParameter("inicio", inicio)
+                .setParameter("fin", fin)
+                .getResultList();
+        });
+    }
+
+    public List<Venta> obtenerTodasVentas() {
+        return execute(em -> {
+            return em.createQuery(
+                    "SELECT DISTINCT v FROM Venta v " +
+                        "LEFT JOIN FETCH v.detalles d " +
+                        "LEFT JOIN FETCH d.producto " +
+                        "ORDER BY v.fechaCreado DESC",
+                    Venta.class)
+                .getResultList();
+        });
     }
 }
