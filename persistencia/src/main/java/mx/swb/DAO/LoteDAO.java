@@ -84,4 +84,17 @@ public class LoteDAO extends AbstractDAO<Lote> {
                 .getResultList()
         );
     }
+
+    // Se usa en la devolución de edición cuando no hay lotes activos
+    public List<Lote> findTodosPorProducto(Integer productoId) {
+        return execute(em ->
+            em.createQuery(
+                    "SELECT l FROM Lote l " +
+                        "WHERE l.producto.id = :productoId " +
+                        "ORDER BY l.activo DESC, l.id DESC",
+                    Lote.class)
+                .setParameter("productoId", productoId)
+                .getResultList()
+        );
+    }
 }
