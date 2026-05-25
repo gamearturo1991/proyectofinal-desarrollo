@@ -30,6 +30,10 @@ public class DelegateLote {
         return loteDAO.findActivosPorProducto(productoId);
     }
 
+    public List<Lote> obtenerTodosLotesPorProducto(Integer productoId) {
+        return loteDAO.findTodosPorProducto(productoId);
+    }
+
     public int obtenerStockActual(Integer productoId) {
         return loteDAO.stockActualProducto(productoId);
     }

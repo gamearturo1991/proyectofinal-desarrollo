@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+  <meta charset="UTF-8"/>
+  <title>Ventas</title>
+  <h:outputStylesheet library="styles" name="productos_agregar_producto.css"/>
+  <h:outputStylesheet library="styles" name="ventas.css"/>
+</h:head>
+
+<h:body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div class="sidebar">
+    <div class="sidebar-seccion">Principal</div>
+    <h:link outcome="index" value="Dashboard"/>
+    <h:link outcome="pos"       value="Punto de Venta"/>
+
+    <div class="sidebar-seccion">Inventario</div>
+    <h:link outcome="agregar_producto" value="Productos"/>
+    <h:link outcome="lotes"            value="Lotes"/>
+    <h:link outcome="movimientos"      value="Movimientos"/>
+    <h:link outcome="categorias"       value="Categorias"/>
+
+    <div class="sidebar-seccion">Compras</div>
+    <h:link outcome="compras"     value="Compras"/>
+    <h:link outcome="proveedores" value="Proveedores"/>
+
+    <div class="sidebar-seccion">Operaciones</div>
+    <h:link outcome="ventas"  styleClass="activo" value="Ventas"/>
+    <h:link outcome="cajas"   value="Cajas"/>
+    <h:link outcome="alertas" value="Alertas"/>
+  </div>
+
+  <!-- ═══ CONTENIDO ═══ -->
+  <div class="contenido">
+
+    <h1>Ventas</h1>
+    <p class="subtitulo">Historial de ventas · Edición de ventas</p>
+
+    <h:form id="formVentas">
+
+      <!-- Mensajes -->
+      <h:panelGroup id="mensajes-panel" layout="block">
+        <h:messages globalOnly="true"
+                    styleClass="mensajes"
+                    infoClass="mensajes-info"
+                    errorClass="mensajes-error"
+                    warnClass="mensajes-warn"
+                    fatalClass="mensajes-fatal"
+                    showDetail="true" showSummary="false"/>
+      </h:panelGroup>
+
+      <!-- ── Tarjetas de resumen ── -->
+      <h:panelGroup id="resumen-panel" layout="block">
+        <div class="ventas-resumen">
+          <div class="resumen-card">
+            <div class="resumen-label">Total ventas</div>
+            <div class="resumen-valor azul">
+              <h:outputText value="#{ventaEditarBeanUI.ventas.size()}"/>
+            </div>
+          </div>
+          <div class="resumen-card">
+            <div class="resumen-label">Total Ingresos</div>
+            <div class="resumen-valor verde">
+              $<h:outputText value="#{ventaEditarBeanUI.totalDia}">
+              <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+            </h:outputText>
+            </div>
+          </div>
+          <div class="resumen-card">
+            <div class="resumen-label">Ventas efectivo</div>
+            <div class="resumen-valor azul">
+              <h:outputText value="#{ventaEditarBeanUI.totalEfectivo}"/>
+            </div>
+          </div>
+          <div class="resumen-card">
+            <div class="resumen-label">Ventas tarjeta / transferencia</div>
+            <div class="resumen-valor naranja">
+              <h:outputText value="#{ventaEditarBeanUI.totalNoEfectivo}"/>
+            </div>
+          </div>
+        </div>
+      </h:panelGroup>
+
+      <!-- ── Filtros (horizontal: buscador izquierda, filtros derecha) ── -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; width: 100%;">
+        <!-- Buscador a la izquierda -->
+        <div style="flex: 2; max-width: 500px;">
+          <h:inputText id="busqueda"
+                       value="#{ventaEditarBeanUI.busqueda}"
+                       placeholder="Buscar por folio o cliente..."
+                       style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; box-sizing: border-box;">
+            <f:ajax event="keyup" render="tabla-panel" delay="300"/>
+          </h:inputText>
+        </div>
+
+        <!-- Filtros a la derecha -->
+        <div style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
+          <h:selectOneMenu id="filtroMetodo"
+                           value="#{ventaEditarBeanUI.filtroMetodo}"
+                           style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: white; font-size: 14px;">
+            <f:selectItem itemValue=""           itemLabel="Todos los métodos"/>
+            <f:selectItem itemValue="efectivo"   itemLabel="Efectivo"/>
+            <f:selectItem itemValue="tarjeta"    itemLabel="Tarjeta"/>
+            <f:selectItem itemValue="transferencia" itemLabel="Transferencia"/>
+            <f:ajax render="tabla-panel"/>
+          </h:selectOneMenu>
+
+          <h:selectOneMenu id="filtroEstado"
+                           value="#{ventaEditarBeanUI.filtroEstado}"
+                           style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: white; font-size: 14px;">
+            <f:selectItem itemValue=""           itemLabel="Todos los estados"/>
+            <f:selectItem itemValue="completada" itemLabel="Completada"/>
+            <f:selectItem itemValue="pendiente"  itemLabel="Pendiente"/>
+            <f:selectItem itemValue="cancelada"  itemLabel="Cancelada"/>
+            <f:ajax render="tabla-panel"/>
+          </h:selectOneMenu>
+
+          <h:commandButton value="↺ Refrescar"
+                           style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;"
+                           action="#{ventaEditarBeanUI.cargarVentas}">
+            <f:ajax render="tabla-panel resumen-panel mensajes-panel"/>
+          </h:commandButton>
+        </div>
+      </div>
+
+      <!-- ── Layout tabla + panel edición ── -->
+      <h:panelGroup id="layout-panel" layout="block">
+        <div class="#{ventaEditarBeanUI.panelAbierto ? 'ventas-layout' : 'ventas-layout sin-panel'}">
+
+          <!-- ════ TABLA DE VENTAS ════ -->
+          <h:panelGroup id="tabla-panel" layout="block">
+            <div class="ventas-tabla-wrap">
+              <div class="ventas-tabla-head">
+                                <span class="ventas-tabla-titulo">
+                                    Historial de ventas —
+                                    <h:outputText value="#{ventaEditarBeanUI.ventasFiltradas.size()}"/> registros
+                                </span>
+              </div>
+
+              <table class="vt">
+                <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Cliente</th>
+                  <th>Método</th>
+                  <th>Estado</th>
+                  <th>Total</th>
+                  <th>Fecha/Hora</th>
+                  <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <ui:fragment rendered="#{empty ventaEditarBeanUI.ventasFiltradas}">
+                  <tr>
+                    <td colspan="7" style="text-align:center;padding:32px;color:#aaa;font-size:13px;">
+                      No hay ventas que coincidan con los filtros
+                    </td>
+                  </tr>
+                </ui:fragment>
+                <ui:fragment rendered="#{not empty ventaEditarBeanUI.ventasFiltradas}">
+                  <ui:repeat value="#{ventaEditarBeanUI.ventasFiltradas}" var="venta">
+                    <tr>
+                      <td>
+                        <span class="vt-folio">#<h:outputText value="#{venta.id}"/></span>
+                      </td>
+                      <td>
+                                                    <span class="vt-cliente">
+                                                        <h:outputText value="#{venta.clienteNombre != null ? venta.clienteNombre : 'Cliente general'}"/>
+                                                    </span>
+                      </td>
+                      <td>
+                                                    <span class="#{ventaEditarBeanUI.getBadgeMetodo(venta.metodoPago.name())}">
+                                                        <h:outputText value="#{ventaEditarBeanUI.getLabelMetodo(venta.metodoPago.name())}"/>
+                                                    </span>
+                      </td>
+                      <td>
+                                                    <span class="#{ventaEditarBeanUI.getBadgeEstado(venta.estado.name())}">
+                                                        <h:outputText value="#{venta.estado}"/>
+                                                    </span>
+                      </td>
+                      <td>
+                                                    <span class="vt-total">
+                                                        $<h:outputText value="#{venta.total}">
+                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                                        </h:outputText>
+                                                    </span>
+                      </td>
+                      <td>
+                                                    <span class="vt-fecha">
+                                                        <h:outputText value="#{venta.fechaCreado.toString().substring(0, 10)}"/>
+                                                        <span style="color:#888;"><h:outputText value="#{venta.fechaCreado.toString().substring(11, 16)}"/></span>
+                                                    </span>
+                      </td>
+                      <td>
+                        <div style="display:flex;gap:5px;">
+                          <ui:fragment rendered="#{venta.estado.name() != 'cancelada'}">
+                            <h:commandButton value="✏ Editar"
+                                             styleClass="btn-vt-editar"
+                                             action="#{ventaEditarBeanUI.seleccionarParaEditar(venta)}">
+                              <f:ajax render=":formVentas:layout-panel :formVentas:mensajes-panel"/>
+                            </h:commandButton>
+                          </ui:fragment>
+                          <ui:fragment rendered="#{venta.estado.name() == 'cancelada'}">
+                            <span class="badge badge-cancelada">Cancelada</span>
+                          </ui:fragment>
+                        </div>
+                      </td>
+                    </tr>
+                  </ui:repeat>
+                </ui:fragment>
+                </tbody>
+              </table>
+            </div>
+          </h:panelGroup>
+
+          <!-- ════ PANEL DE EDICIÓN ════ -->
+          <ui:fragment rendered="#{ventaEditarBeanUI.panelAbierto}">
+            <div class="editar-panel">
+
+              <!-- Header del panel -->
+              <div class="editar-head">
+                <div>
+                  <div class="editar-titulo">Editando venta</div>
+                  <div class="editar-folio">
+                    Folio #<h:outputText value="#{ventaEditarBeanUI.ventaSeleccionada.id}"/>
+                  </div>
+                </div>
+                <h:commandButton value="✕"
+                                 styleClass="btn-cerrar-panel"
+                                 action="#{ventaEditarBeanUI.cerrarPanel}"
+                                 immediate="true">
+                  <f:ajax render="layout-panel mensajes-panel"/>
+                </h:commandButton>
+              </div>
+
+              <!-- Info de la venta -->
+              <div class="editar-info">
+                <div class="editar-info-item">
+                  <span class="editar-info-label">Cliente</span>
+                  <span class="editar-info-val">
+                                        <h:outputText value="#{ventaEditarBeanUI.ventaSeleccionada.clienteNombre != null
+                                            ? ventaEditarBeanUI.ventaSeleccionada.clienteNombre
+                                            : 'General'}"/>
+                                    </span>
+                </div>
+                <div class="editar-info-item">
+                  <span class="editar-info-label">Método</span>
+                  <span class="editar-info-val">
+                                        <h:outputText value="#{ventaEditarBeanUI.getLabelMetodo(
+                                            ventaEditarBeanUI.ventaSeleccionada.metodoPago.name())}"/>
+                                    </span>
+                </div>
+                <div class="editar-info-item">
+                  <span class="editar-info-label">Original</span>
+                  <span class="editar-info-val">
+                                        $<h:outputText value="#{ventaEditarBeanUI.ventaSeleccionada.total}">
+                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText>
+                                    </span>
+                </div>
+              </div>
+
+              <!-- Aviso de ajuste de stock -->
+              <div class="editar-aviso">
+                ⚠ Al guardar, el stock de lotes se ajustará automáticamente:
+                quitar productos devuelve unidades al lote; agregar productos
+                descuenta del lote disponible.
+              </div>
+
+              <!-- Items editables del carrito -->
+              <h:panelGroup id="editar-items-panel" layout="block">
+                <div class="editar-detalles">
+                  <ui:fragment rendered="#{empty ventaEditarBeanUI.itemsVisibles}">
+                    <div class="carrito-vacio">Sin productos en esta venta</div>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{not empty ventaEditarBeanUI.itemsVisibles}">
+                    <ui:repeat value="#{ventaEditarBeanUI.itemsVisibles}" var="item">
+                      <div class="editar-item"
+                           title="#{item.nombreProducto} | $#{item.precioUnitario} c/u | Cant: #{item.cantidad} | Subtotal: $#{item.subtotal}">
+                        <div class="ei-info">
+                          <div class="ei-nombre">
+                            <h:outputText value="#{item.nombreProducto}"/>
+                          </div>
+                          <div class="ei-precio">
+                            $<h:outputText value="#{item.precioUnitario}">
+                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                          </h:outputText> c/u
+                          </div>
+                        </div>
+                        <div class="ei-controles">
+                          <h:commandButton value="−"
+                                           styleClass="ei-qty-btn restar"
+                                           action="#{ventaEditarBeanUI.disminuirItem(item.productoId)}">
+                            <f:ajax render=":formVentas:editar-items-panel :formVentas:editar-totales-panel :formVentas:mensajes-panel"/>
+                          </h:commandButton>
+                          <span class="ei-qty">
+                                                        <h:outputText value="#{item.cantidad}"/>
+                                                    </span>
+                          <h:commandButton value="+"
+                                           styleClass="ei-qty-btn"
+                                           action="#{ventaEditarBeanUI.aumentarItem(item.productoId)}">
+                            <f:ajax render=":formVentas:editar-items-panel :formVentas:editar-totales-panel :formVentas:mensajes-panel"/>
+                          </h:commandButton>
+                        </div>
+                        <span class="ei-subtotal">
+                                                    $<h:outputText value="#{item.subtotal}">
+                                                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                                    </h:outputText>
+                                                </span>
+                        <h:commandButton value="✕"
+                                         styleClass="ei-btn-quitar"
+                                         title="Quitar producto"
+                                         action="#{ventaEditarBeanUI.quitarItem(item.productoId)}">
+                          <f:ajax render=":formVentas:editar-items-panel :formVentas:editar-totales-panel :formVentas:mensajes-panel"/>
+                        </h:commandButton>
+                      </div>
+                    </ui:repeat>
+                  </ui:fragment>
+                </div>
+              </h:panelGroup>
+
+              <!-- Agregar producto a la venta -->
+              <div class="editar-agregar">
+                <div class="editar-agregar-titulo">Agregar producto</div>
+                <div class="editar-agregar-search">
+                  <h:inputText id="busquedaProducto"
+                               value="#{ventaEditarBeanUI.busquedaProducto}"
+                               styleClass="editar-search-prod"
+                               placeholder="Nombre del producto..."
+                               onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('formVentas:btnBuscarProducto').click();}"/>
+                  <h:commandButton id="btnBuscarProducto"
+                                   value="Buscar"
+                                   styleClass="btn-buscar-prod"
+                                   action="#{ventaEditarBeanUI.buscarProductos}">
+                    <f:ajax execute="@form"
+                            render=":formVentas:productos-encontrados-panel :formVentas:mensajes-panel"/>
+                  </h:commandButton>
+                </div>
+                <h:panelGroup id="productos-encontrados-panel" layout="block">
+                  <ui:fragment rendered="#{empty ventaEditarBeanUI.productosEncontrados and not ventaEditarBeanUI.busquedaRealizada}">
+                  </ui:fragment>
+                  <ui:fragment rendered="#{empty ventaEditarBeanUI.productosEncontrados and ventaEditarBeanUI.busquedaRealizada}">
+                    <div class="editar-buscar-hint">Sin resultados para la búsqueda</div>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{not empty ventaEditarBeanUI.productosEncontrados}">
+                    <h:selectOneListbox id="productoAgregarId"
+                                        value="#{ventaEditarBeanUI.productoAgregarId}"
+                                        size="5"
+                                        styleClass="editar-listbox-prod">
+                      <f:selectItems value="#{ventaEditarBeanUI.productosEncontrados}"
+                                     var="prod"
+                                     itemValue="#{prod.id}"
+                                     itemLabel="#{prod.nombre} ($#{prod.precioVenta})"
+                                     itemDescription="#{prod.nombre} | Precio: $#{prod.precioVenta} | Stock disponible: #{prod.stockActual}"/>
+                    </h:selectOneListbox>
+                  </ui:fragment>
+                </h:panelGroup>
+                <div class="editar-agregar-bottom">
+                  <h:inputText id="cantidadAgregar"
+                               value="#{ventaEditarBeanUI.cantidadAgregar}"
+                               styleClass="editar-input-qty"
+                               placeholder="Cant."/>
+                  <h:commandButton value="+ Agregar"
+                                   styleClass="btn-editar-agregar"
+                                   action="#{ventaEditarBeanUI.agregarProductoEdicion}">
+                    <f:ajax execute="@form"
+                            render=":formVentas:editar-items-panel :formVentas:editar-totales-panel :formVentas:mensajes-panel"/>
+                  </h:commandButton>
+                </div>
+              </div>
+
+              <!-- Totales actualizados -->
+              <h:panelGroup id="editar-totales-panel" layout="block">
+                <div class="editar-totales">
+                  <div class="et-fila">
+                    <span>Subtotal nuevo</span>
+                    <span>$<h:outputText value="#{ventaEditarBeanUI.subtotalEdicion}">
+                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText></span>
+                  </div>
+                  <div class="et-fila">
+                    <span>Descuento</span>
+                    <span style="color:#e53935;">
+                                            -$<h:outputText value="#{ventaEditarBeanUI.ventaSeleccionada.descuento}">
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                            </h:outputText>
+                                        </span>
+                  </div>
+                  <div class="et-fila">
+                    <span>Impuesto</span>
+                    <span>$<h:outputText value="#{ventaEditarBeanUI.ventaSeleccionada.impuesto}">
+                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText></span>
+                  </div>
+                  <div class="et-fila et-total">
+                    <span>TOTAL NUEVO</span>
+                    <span>$<h:outputText value="#{ventaEditarBeanUI.totalEdicion}">
+                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                                        </h:outputText></span>
+                  </div>
+                  <ui:fragment rendered="#{ventaEditarBeanUI.ventaSeleccionada.metodoPago.name() == 'efectivo'}">
+                    <div class="et-fila" style="margin-top:6px;">
+                      <span>Monto recibido</span>
+                      <span>
+                        $<h:inputText value="#{ventaEditarBeanUI.montoRecibidoEdicion}"
+                                      styleClass="et-input-monto"
+                                      placeholder="0.00">
+                          <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                          <f:ajax event="change" execute="@this"
+                                  render=":formVentas:editar-totales-panel"/>
+                        </h:inputText>
+                      </span>
+                    </div>
+                    <div class="et-fila">
+                      <span>Cambio</span>
+                      <span style="color:#4caf7d;font-weight:700;">
+                        $<h:outputText value="#{ventaEditarBeanUI.cambioEdicion}">
+                          <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                        </h:outputText>
+                      </span>
+                    </div>
+                  </ui:fragment>
+                </div>
+              </h:panelGroup>
+
+              <!-- Botones finales -->
+              <div class="editar-acciones">
+                <h:commandButton value="Cancelar"
+                                 styleClass="btn-cancelar-edicion"
+                                 action="#{ventaEditarBeanUI.cerrarPanel}"
+                                 immediate="true">
+                  <f:ajax render="layout-panel mensajes-panel"/>
+                </h:commandButton>
+                <h:commandButton value="Guardar cambios ✓"
+                                 styleClass="btn-guardar-edicion"
+                                 action="#{ventaEditarBeanUI.guardarEdicion}">
+                  <f:ajax execute="@form"
+                          render="layout-panel resumen-panel mensajes-panel"/>
+                </h:commandButton>
+              </div>
+
+            </div>
+          </ui:fragment>
+
+        </div>
+      </h:panelGroup>
+
+    </h:form>
+  </div>
+
+</h:body>
+</html>
