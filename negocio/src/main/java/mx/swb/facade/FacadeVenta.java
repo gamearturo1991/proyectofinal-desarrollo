@@ -1,13 +1,11 @@
-// ── FacadeVenta.java ──  mx/swb/facade/FacadeVenta.java
 package mx.swb.facade;
 
-import mx.swb.delegate.DelegateVenta;
 import mx.swb.entity.Venta;
+import mx.swb.negocio.ItemEdicionDTO;
 import mx.swb.negocio.VentaService;
 import mx.swb.negocio.VentaService.ItemVenta;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public class FacadeVenta {
@@ -37,7 +35,16 @@ public class FacadeVenta {
         );
     }
 
+    public void editarVenta(Integer ventaId, List<ItemEdicionDTO> items, BigDecimal montoRecibido) {
+        VentaService service = new VentaService();
+        service.editarVenta(ventaId, items, montoRecibido);
+    }
+
     public List<Venta> obtenerHoy() {
         return service.obtenerVentasHoy();
+    }
+
+    public List<Venta> obtenerTodasVentas() {
+        return service.obtenerTodasVentas();
     }
 }
