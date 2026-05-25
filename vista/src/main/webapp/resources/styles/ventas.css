@@ -1,0 +1,806 @@
+/*Barra de filtro*/
+.ventas-filtros {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.ventas-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.ventas-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #888;
+    pointer-events: none;
+}
+
+.ventas-search-input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e8f0eb;
+    font-size: 13px;
+    color: #555;
+    font-family: Arial, sans-serif;
+    outline: none;
+}
+
+.ventas-search-input:focus {
+    background-color: #d8ebe0;
+}
+
+.ventas-select {
+    background-color: #e8f0eb;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #555;
+    font-family: Arial, sans-serif;
+    outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Tarjetas de resumen */
+.ventas-resumen {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.resumen-card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 18px;
+    border: 1px solid #dde8e1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resumen-label {
+    font-size: 11px;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.resumen-valor {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a2e44;
+    font-family: monospace;
+}
+
+.resumen-valor.verde  { color: #4caf7d; }
+.resumen-valor.azul   { color: #1a2e44; }
+.resumen-valor.rojo   { color: #e53935; }
+.resumen-valor.naranja{ color: #f57c00; }
+
+/* Tabla de ventas */
+.ventas-tabla-wrap {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #dde8e1;
+    overflow: hidden;
+}
+
+.ventas-tabla-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ventas-tabla-titulo {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2e44;
+}
+
+.btn-refresh {
+    background: #e8f0eb;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2a7a50;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: background 0.13s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-refresh:hover {
+    background: #c8e6c9;
+}
+
+/* tabla */
+.vt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.vt thead tr {
+    background: #f5f7fa;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.vt th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.vt td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f5f5f5;
+    color: #1a2e44;
+    vertical-align: middle;
+}
+
+.vt tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.vt tbody tr:hover td {
+    background: #f9fcfa;
+}
+
+.vt-folio {
+    font-family: monospace;
+    font-weight: 700;
+    color: #1a2e44;
+}
+
+.vt-cliente {
+    font-size: 13px;
+    color: #555;
+}
+
+.vt-total {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: #4caf7d;
+}
+
+.vt-fecha {
+    font-size: 12px;
+    color: #888;
+    font-family: monospace;
+}
+
+/* Base badge */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: monospace;
+}
+
+/* Badges de método de pago */
+.badge-efectivo      { background: rgba(76,175,125,.12);  color: #2a7a50; }
+.badge-tarjeta       { background: rgba(30,136,229,.12);  color: #0d47a1; }
+.badge-transferencia { background: rgba(255,168,69,.12);  color: #8a5a00; }
+.badge-completada    { background: rgba(76,175,125,.12);  color: #2a7a50; }
+.badge-cancelada     { background: rgba(229,57,53,.12);   color: #b71c1c; }
+.badge-pendiente     { background: rgba(255,168,69,.12);  color: #8a5a00; }
+
+/* Badges de stock (mismo sistema que POS) */
+.badge-ok   { background: rgba(76,175,125,.12);  color: #2a7a50; }
+.badge-low  { background: rgba(255,168,69,.12);  color: #8a5a00; }
+.badge-out  { background: rgba(229,57,53,.12);   color: #b71c1c; }
+.badge-blue { background: rgba(30,136,229,.12);  color: #0d47a1; font-size: 12px; font-weight: 600; }
+
+/* Botones de acción en tabla */
+.btn-vt-editar {
+    background: #e8f0eb;
+    border: 1px solid #c8ddd0;
+    border-radius: 7px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2a7a50;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: all 0.13s;
+}
+
+.btn-vt-editar:hover {
+    background: #c8e6c9;
+    border-color: #4caf7d;
+}
+
+.btn-vt-ver {
+    background: #e8f0f8;
+    border: 1px solid #c5d8ec;
+    border-radius: 7px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #185fa5;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: all 0.13s;
+}
+
+.btn-vt-ver:hover {
+    background: #c5d8ec;
+}
+
+/* Panel lateral de edición */
+.ventas-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 14px;
+    align-items: start;
+}
+
+.ventas-layout.sin-panel {
+    grid-template-columns: 1fr;
+}
+
+.editar-panel {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #dde8e1;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.editar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #f5f7fa;
+}
+
+.editar-titulo {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2e44;
+}
+
+.editar-folio {
+    font-size: 12px;
+    color: #888;
+    font-family: monospace;
+    margin-top: 2px;
+}
+
+.btn-cerrar-panel {
+    background: transparent;
+    border: 1px solid #dde8e1;
+    border-radius: 7px;
+    padding: 4px 9px;
+    font-size: 13px;
+    color: #888;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: all 0.13s;
+}
+
+.btn-cerrar-panel:hover {
+    border-color: #e53935;
+    color: #e53935;
+}
+
+/* Info de la venta a editar */
+.editar-info {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.editar-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.editar-info-label {
+    font-size: 10px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+}
+
+.editar-info-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a2e44;
+    font-family: monospace;
+}
+
+/* Tabla de detalles editables */
+.editar-detalles {
+    padding: 10px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.editar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.editar-item:last-child {
+    border-bottom: none;
+}
+
+.ei-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ei-nombre {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a2e44;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ei-precio {
+    font-size: 11px;
+    color: #aaa;
+    font-family: monospace;
+    margin-top: 1px;
+}
+
+.ei-controles {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.ei-qty-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid #dde8e1;
+    background: #f0f5f2;
+    color: #1a2e44;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.1s;
+}
+
+.ei-qty-btn:hover {
+    border-color: #4caf7d;
+    color: #4caf7d;
+    background: #e8f5e9;
+}
+
+.ei-qty-btn.restar:hover {
+    border-color: #e53935;
+    color: #e53935;
+    background: #fdecea;
+}
+
+.ei-qty {
+    width: 26px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: monospace;
+    color: #1a2e44;
+}
+
+.ei-subtotal {
+    font-size: 12px;
+    font-family: monospace;
+    font-weight: 700;
+    color: #4caf7d;
+    min-width: 52px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.ei-btn-quitar {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    transition: color 0.1s;
+}
+
+.ei-btn-quitar:hover {
+    color: #e53935;
+}
+
+/* Agregar producto a la venta */
+.editar-agregar {
+    padding: 10px 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.editar-agregar-titulo {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 8px;
+}
+
+.editar-agregar-search {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.editar-search-prod {
+    flex: 1;
+    background: #e8f0eb;
+    border: 1px solid #c8ddd0;
+    border-radius: 7px;
+    padding: 6px 9px;
+    font-size: 12px;
+    color: #1a2e44;
+    font-family: Arial, sans-serif;
+    outline: none;
+}
+
+.editar-search-prod:focus {
+    border-color: #4caf7d;
+    background: #dff0e6;
+}
+
+.btn-buscar-prod {
+    background: #4caf7d;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.13s;
+}
+
+.btn-buscar-prod:hover {
+    background: #3a9668;
+}
+
+.editar-listbox-prod {
+    width: 100%;
+    background: #f9fcfa;
+    border: 1px solid #c8ddd0;
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    color: #1a2e44;
+    margin-bottom: 6px;
+    outline: none;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.editar-listbox-prod option {
+    padding: 5px 8px;
+    white-space: nowrap;
+}
+
+.editar-buscar-hint {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    padding: 8px 0;
+    font-style: italic;
+}
+
+.editar-agregar-bottom {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.editar-agregar-grid {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 6px;
+    align-items: center;
+}
+
+.editar-input-qty {
+    width: 52px;
+    background: #e8f0eb;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 8px;
+    font-size: 12px;
+    color: #1a2e44;
+    font-family: monospace;
+    outline: none;
+    text-align: center;
+}
+
+.btn-editar-agregar {
+    background: #4caf7d;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: background 0.13s;
+    white-space: nowrap;
+}
+
+.btn-editar-agregar:hover {
+    background: #3a9668;
+}
+
+/* Totales del panel edición */
+.editar-totales {
+    padding: 10px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.et-fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888;
+}
+
+.et-fila span:last-child {
+    font-family: monospace;
+    font-weight: 500;
+}
+
+.et-total {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a2e44;
+    padding-top: 6px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 2px;
+}
+
+.et-total span:last-child {
+    font-family: monospace;
+    font-size: 17px;
+    color: #4caf7d;
+}
+
+.et-input-monto {
+    width: 90px;
+    background: #e8f0eb;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 7px;
+    font-size: 13px;
+    font-family: monospace;
+    color: #1a2e44;
+    outline: none;
+    text-align: right;
+}
+
+/* Aviso de ajuste de stock */
+.editar-aviso {
+    margin: 10px 18px;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #7a5800;
+    line-height: 1.5;
+}
+
+/* Botones de acción finales */
+.editar-acciones {
+    padding: 14px 18px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-guardar-edicion {
+    flex: 1;
+    background: #4caf7d;
+    border: none;
+    border-radius: 9px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: background 0.13s;
+    justify-content: center;
+}
+
+.btn-guardar-edicion:hover {
+    background: #3a9668;
+}
+
+.btn-cancelar-edicion {
+    background: white;
+    border: 1.5px solid #dde8e1;
+    border-radius: 9px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: all 0.13s;
+}
+
+.btn-cancelar-edicion:hover {
+    border-color: #e53935;
+    color: #e53935;
+}
+
+/* Paginación */
+.ventas-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 12px;
+    color: #888;
+}
+
+.paginacion-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-pag {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid #dde8e1;
+    background: white;
+    color: #555;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.13s;
+}
+
+.btn-pag:hover   { border-color: #4caf7d; color: #4caf7d; }
+.btn-pag.activo  { background: #4caf7d; border-color: #4caf7d; color: white; font-weight: 700; }
+.btn-pag:disabled{ opacity: 0.4; cursor: not-allowed; }
+
+/* ── Mensajes ── */
+.mensajes { margin-bottom: 12px; }
+
+.mensajes-error,
+.ui-messages-error,
+.ui-messages-error-summary,
+.ui-messages-error-detail {
+    display: block;
+    background-color: #fdecea;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #c62828;
+}
+
+.mensajes-info,
+.ui-messages-info,
+.ui-messages-info-summary,
+.ui-messages-info-detail {
+    display: block;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #155724;
+}
+
+.mensajes-warn,
+.ui-messages-warn,
+.ui-messages-warn-summary,
+.ui-messages-warn-detail {
+    display: block;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #856404;
+}
+
+.mensajes-fatal {
+    display: block;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #842029;
+    font-weight: bold;
+}
+
+.mensajes-ok {
+    display: block;
+    background-color: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #2a7a50;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
