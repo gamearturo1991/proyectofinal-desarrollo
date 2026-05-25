@@ -11,6 +11,7 @@ public class ServiceLocator {
     private static MovimientoInventarioDAO movimientoInventarioDAO;
     private static VentaDAO ventaDAO;
     private static CajaDAO cajaDAO;
+    private static DetalleVentaDAO detalleVentaDAO;
 
     public static EntityManager getEntityManager(){
         return HibernateUtil.getEntityManager();
@@ -59,5 +60,11 @@ public class ServiceLocator {
         } else{
             return cajaDAO;
         }
+    }
+
+    public static DetalleVentaDAO getInstanceDetalleVentaDAO() {
+        if (detalleVentaDAO == null)
+            detalleVentaDAO = new DetalleVentaDAO(getEntityManager());
+        return detalleVentaDAO;
     }
 }
